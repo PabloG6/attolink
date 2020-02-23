@@ -56,14 +56,21 @@ defmodule AttoLink.Atto do
 
   """
   def create_preview(url) do
-    IO.puts url
     preview = LinkPreview.create(url)
     preview
   end
 
   @todo "0.0.1": "Save html page instead/save html page too"
   @todo "add @spec and @moduledoc"
-  def cache_preview(attrs \\ %LinkPreview.Page{} = %LinkPreview.Page{}) do
+  def cache_preview( %LinkPreview.Page{original_url: original_url} = attrs) do
+    {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
+    {:ok, file} = File.open("helloworld.html", [:write, :read, :utf8])
+    IO.puts body
+    IO.write(file, body)
+    pid = IO.read(file, :all)
+    IO.puts "file"
+    IO.inspect pid
+
     Preview.changeset(%Preview{}, Map.from_struct(attrs)) |> Repo.insert()
   end
 

@@ -4,7 +4,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   alias AttoLink.Atto
   alias AttoLink.Atto.Preview
 
-  @valid_url "https://google.com"
+  @valid_url "https://pusher.com"
 
   def fixture(:preview) do
     {:ok, preview} = Atto.create_preview(@create_attrs)
@@ -34,6 +34,15 @@ defmodule AttoLinkWeb.PreviewControllerTest do
                "website_url" => websites_url,
                "original_url" => original_url
              } = json_response(conn, 200)["data"]
+    end
+
+    test "caches web page and renders preview when data is valid", %{conn: conn} do
+      conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url, cacheUrl: true)
+      assert %{"title" => title,
+              "description" => description,
+              "images" => images,
+              "website_url" => website_url,
+              "original_url" => original_url} = json_response(conn, 201)["data"]
     end
   end
 

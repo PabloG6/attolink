@@ -13,20 +13,28 @@ defmodule AttoLinkWeb.PreviewController do
     render(conn, "index.json", preview: preview)
   end
 
-  def create(conn, %{"url" => url} = _query_params) do
-
-    IO.puts "Hello world"
+  @todo "fix error message to return appropriate error"
+  def create(conn, %{"url" => url, "cacheUrl" => true} = _query_params) do
     with {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url),
          {:ok, %Preview{} = cached_preview} <- Atto.cache_preview(page_preview) do
-      IO.inspect(page_preview)
+          conn
+          |> put_status(:created)
+          |> put_resp_header("content-type", "application/json")
+          |> render("show.json", preview: page_preview)
+
+    end
+
+  end
+
+  def create(conn, %{"url" => url} = _query_params) do
+
+    with {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url) do
 
       conn
-      |> put_status(:created)
+      |> put_status(:ok)
       |> put_resp_header("content-type", "application/json")
       |> render("show.json", preview: page_preview)
-    else
-      err ->
-        IO.puts(err)
+
     end
   end
 
@@ -52,5 +60,4 @@ defmodule AttoLinkWeb.PreviewController do
     end
   end
 
-  @todo "0.0.1": "update this to cache the html page and then return {:ok}"
 end

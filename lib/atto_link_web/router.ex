@@ -2,7 +2,7 @@ defmodule AttoLinkWeb.Router do
   use AttoLinkWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "html"]
   end
 
   scope "/api", AttoLinkWeb do
@@ -10,6 +10,6 @@ defmodule AttoLinkWeb.Router do
   end
 
   scope "/", AttoLinkWeb do
-    resources "/", PreviewController, except: [:new, :edit]
+    get "/", PreviewController, :create
   end
 end

@@ -5,6 +5,12 @@ defmodule AttoLinkWeb.FallbackController do
   See `Phoenix.Controller.action_fallback/1` for more details.
   """
   use AttoLinkWeb, :controller
+  def call(conn, {:error, %LinkPreview.Error{} = error}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(AttoLinkWeb.ErrorView)
+    |> render("error.json", errors: error)
+  end
 
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
