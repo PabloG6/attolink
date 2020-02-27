@@ -116,10 +116,9 @@ defmodule AttoLink.Accounts do
   end
 
   def authenticate_user(%User{email: email, password: password}) do
-    Repo.get_by(User, [email: email])
-    |>check_pass(password)
+    Repo.get_by(User, email: email)
+    |> check_pass(password)
   end
-
 
   alias AttoLink.Accounts.Api
 

@@ -25,4 +25,9 @@ defmodule AttoLinkWeb.ErrorView do
   def render("401.json", _errors) do
     %{detail: %{message: "an unknown error has occured"}}
   end
+
+  def render("too_many_request.json", error) do
+    %{detail: %{message: "You've reached your daily limit"}}
+  end
+
 end

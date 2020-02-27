@@ -17,3 +17,6 @@ config :atto_link, AttoLinkWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 config :bcrypt_elixir, :log_rounds, 4
+
+config :hammer,
+  backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10, pool_size: 2]}

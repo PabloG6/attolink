@@ -8,7 +8,6 @@ defmodule AttoLinkWeb.Router do
 
   pipeline :auth do
     plug AttoLink.Auth.Pipeline
-
   end
 
   @todo "0.0.1": "Create a login"
@@ -23,6 +22,4 @@ defmodule AttoLinkWeb.Router do
     resources "/user", UserController, except: [:new, :edit, :create]
     resources "/", ApiController, except: [:new, :edit]
   end
-
-
 end

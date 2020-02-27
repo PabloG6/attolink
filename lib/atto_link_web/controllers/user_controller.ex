@@ -40,16 +40,15 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
+  @spec signup_reply(Plug.Conn.t(), User.t()) :: Plug.Conn.t()
   defp signup_reply(conn, user = %User{}) do
-    with {:ok, reply} <- Accounts.authenticate_user(user),
+    with {:ok, _reply} <- Accounts.authenticate_user(user),
          conn <- AttoLink.Auth.Guardian.Plug.sign_in(conn, user),
          token <- AttoLink.Auth.Guardian.Plug.current_token(conn) do
-        conn
-        |> put_status(:created)
-        |> put_view(AttoLinkWeb.UserView)
-        |> render(:login, user: user, token: token)
+      conn
+      |> put_status(:created)
+      |> put_view(AttoLinkWeb.UserView)
+      |> render(:login, user: user, token: token)
     end
-
   end
-
 end

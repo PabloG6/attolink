@@ -16,7 +16,5 @@ defmodule AttoLinkWeb.UserView do
 
   def render("login.json", %{user: user, token: token}) do
     %{data: %{email: user.email, id: user.id, token: token}}
-
   end
-
 end

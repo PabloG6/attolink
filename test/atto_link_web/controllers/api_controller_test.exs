@@ -21,7 +21,6 @@ defmodule AttoLinkWeb.ApiControllerTest do
     setup [:create_user, :sign_in_user]
 
     test "lists all api_key", %{conn: conn} do
-      IO.puts("Authenticated? #{AttoLink.Auth.Guardian.Plug.authenticated?(conn)}")
       conn = get(conn, Routes.api_path(conn, :index))
       assert json_response(conn, 200)["data"] == []
     end

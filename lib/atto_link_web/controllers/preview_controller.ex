@@ -25,17 +25,31 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url} = _query_params) do
-
-    with {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url) do
+    user = Guardian.Plug.current_resource(conn)
+    with {:allow, count} <- Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, 50),
+      {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url) do
 
       conn
       |> put_status(:ok)
       |> put_resp_header("content-type", "application/json")
-      |> render("show.json", preview: page_preview)
+      |> render("show.json", preview: page_preview, count: count)
 
+      else
+        {:deny, limit} -> deny_limit(conn, limit)
+        err -> err
     end
   end
 
+  @spec deny_limit(Plug.Conn.t(), integer):: Plug.Conn.t()
+  defp deny_limit(conn, limit) do
+    conn
+    |> put_status(:too_many_requests)
+    |> put_view(AttoLinkWeb.ErrorView)
+    |> render(:too_many_requests, limit: limit)
+  end
+
+
+  @todo "Fix this to return data saved in database along side user who saved it."
   def show(conn, %{"url" => url}) do
     preview = Atto.get_preview!(url)
 

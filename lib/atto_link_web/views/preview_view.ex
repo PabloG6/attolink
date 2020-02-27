@@ -10,6 +10,10 @@ defmodule AttoLinkWeb.PreviewView do
     %{data: render_one(preview, PreviewView, "preview.json")}
   end
 
+  def render("show.json", %{preview: preview, limit: limit}) do
+    %{data: render_one(preview, PreviewView, "preview.json", limit: limit)}
+  end
+
   def render("preview.json", %{preview: preview}) do
     %{
       original_url: preview.original_url,
@@ -19,4 +23,17 @@ defmodule AttoLinkWeb.PreviewView do
       description: preview.description
     }
   end
+
+  def render("preview.json", %{preview: preview, limit: limit}) do
+    %{
+      original_url: preview.original_url,
+      website_url: preview.website_url,
+      title: preview.title,
+      images: preview.images,
+      description: preview.description,
+      limit: limit
+    }
+  end
+
+
 end

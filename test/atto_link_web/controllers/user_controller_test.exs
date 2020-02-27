@@ -25,11 +25,10 @@ defmodule AttoLinkWeb.UserControllerTest do
 
   describe "index" do
     setup [:create_user, :sign_in_user]
-    test "lists all user", %{conn: conn, user: user} do
 
+    test "lists all user", %{conn: conn, user: user} do
       conn = get(conn, Routes.user_path(conn, :index))
-      assert json_response(conn, 200)["data"] == [%{"email" => user.email,
-                                                    "id" => user.id }]
+      assert json_response(conn, 200)["data"] == [%{"email" => user.email, "id" => user.id}]
     end
   end
 
@@ -37,9 +36,9 @@ defmodule AttoLinkWeb.UserControllerTest do
     test "renders user when data is valid", %{conn: conn} do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
       assert %{"id" => id, "email" => email, "token" => token} = json_response(conn, 201)["data"]
-      conn = build_conn() |> put_req_header("authorization", "bearer: "<> token)
+      conn = build_conn() |> put_req_header("authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :show, id))
-      IO.inspect conn
+
       assert %{
                "id" => id,
                "email" => "some email"
