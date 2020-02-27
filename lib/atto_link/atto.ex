@@ -2,12 +2,13 @@ defmodule AttoLink.Atto do
   @moduledoc """
   The Atto context.
   """
-
+  use TODO
   import Ecto.Query, warn: false
   alias AttoLink.Repo
   alias LinkPreview
   alias AttoLink.Atto.Preview
 
+  @compile :nowarn_unused_vars
   @doc """
   Returns the list of preview.
 
@@ -62,16 +63,20 @@ defmodule AttoLink.Atto do
 
   @todo "0.0.1": "Save html page instead/save html page too"
   @todo "add @spec and @moduledoc"
-  def cache_preview( %LinkPreview.Page{original_url: original_url} = attrs) do
-    {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
-    {:ok, file} = File.open("helloworld.html", [:write, :read, :utf8])
-    IO.puts body
-    IO.write(file, body)
-    pid = IO.read(file, :all)
-    IO.puts "file"
-    IO.inspect pid
+  def cache_preview(%LinkPreview.Page{original_url: original_url} = attrs) do
+    save_html_page(original_url)
 
     Preview.changeset(%Preview{}, Map.from_struct(attrs)) |> Repo.insert()
+  end
+
+  defp save_html_page(original_url) do
+    # {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
+    # {:ok, file} = File.open("helloworld.html", [:write, :read, :utf8])
+    # # IO.puts body
+    # # IO.write(file, body)
+    # # {:ok, pid} = IO.read(file, :all)
+    # # IO.puts "file"
+    # # IO.inspect pid
   end
 
   @doc """

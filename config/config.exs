@@ -26,7 +26,13 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 config :tesla, adapter: Tesla.Adapter.Hackney
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
+config :hammer,
+  backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10]}
+
+config :atto_link, AttoLink.Auth.Guardian,
+  issuer: "atto_link",
+  secret_key: "S3+n62kfi2VyUW5Ng0MDxfcmjPIgSkMhtCWVdYA4UTKnlBmbi3fUrBJP6t4vjGtD"
+
 import_config "#{Mix.env()}.exs"

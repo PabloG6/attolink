@@ -37,13 +37,17 @@ defmodule AttoLink.MixProject do
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.1"},
+      {:bcrypt_elixir, "~> 2.0"},
+      {:secure_random, "~> 0.5.1"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:mogrify, "~> 0.7.3", optional: true},
       {:link_preview, git: "https://github.com/PabloG6/link_preview.git"},
       {:plug_cowboy, "~> 2.0"},
-      {:todo, " >= 1.0.0", only: :dev}
+      {:guardian, "~> 2.0"},
+      {:poison, "~> 4.0"},
+      {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end
 

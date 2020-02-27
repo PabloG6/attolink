@@ -17,4 +17,12 @@ defmodule AttoLinkWeb.ErrorView do
   def render("error.json", %{errors: %LinkPreview.Error{message: message, origin: origin}}) do
     %{detail: %{message: message, origin: origin}}
   end
+
+  def render("401.json", %{message: message}) do
+    %{detail: %{message: message}}
+  end
+
+  def render("401.json", _errors) do
+    %{detail: %{message: "an unknown error has occured"}}
+  end
 end

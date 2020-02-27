@@ -1,12 +1,10 @@
 defmodule AttoLinkWeb.PreviewController do
   use AttoLinkWeb, :controller
-
+  use TODO
   alias AttoLink.Atto
   alias AttoLink.Atto.Preview
-  alias LinkPreview.Page
-
   action_fallback AttoLinkWeb.FallbackController
-  @type cache_preview :: {:ok, %Preview{}}
+
 
   def index(conn, _params) do
     preview = Atto.list_preview()
@@ -16,7 +14,7 @@ defmodule AttoLinkWeb.PreviewController do
   @todo "fix error message to return appropriate error"
   def create(conn, %{"url" => url, "cacheUrl" => true} = _query_params) do
     with {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url),
-         {:ok, %Preview{} = cached_preview} <- Atto.cache_preview(page_preview) do
+         {:ok, %Preview{} = _cached_preview} <- Atto.cache_preview(page_preview) do
           conn
           |> put_status(:created)
           |> put_resp_header("content-type", "application/json")
@@ -46,7 +44,6 @@ defmodule AttoLinkWeb.PreviewController do
 
   def update(conn, %{"id" => id, "preview" => preview_params}) do
     preview = Atto.get_preview!(id)
-
     with {:ok, %Preview{} = preview} <- Atto.update_preview(preview, preview_params) do
       render(conn, "show.json", preview: preview)
     end

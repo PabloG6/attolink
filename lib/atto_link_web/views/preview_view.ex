@@ -11,7 +11,6 @@ defmodule AttoLinkWeb.PreviewView do
   end
 
   def render("preview.json", %{preview: preview}) do
-
     %{
       original_url: preview.original_url,
       website_url: preview.website_url,

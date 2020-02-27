@@ -56,3 +56,4 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 config :todo, print: :all, persist: false
+config :brcypt_elixir, :log_rounds, 4

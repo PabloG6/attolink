@@ -5,6 +5,7 @@ defmodule AttoLinkWeb.FallbackController do
   See `Phoenix.Controller.action_fallback/1` for more details.
   """
   use AttoLinkWeb, :controller
+
   def call(conn, {:error, %LinkPreview.Error{} = error}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -31,5 +32,12 @@ defmodule AttoLinkWeb.FallbackController do
     |> put_status(:internal_server_error)
     |> put_view(AttoLinkWeb.ErrorView)
     |> render(:"404")
+  end
+
+  def call(conn, error) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(AttoLinkWeb.ErrorView)
+    |> render(:"401")
   end
 end
