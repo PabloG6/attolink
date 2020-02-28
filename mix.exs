@@ -48,6 +48,7 @@ defmodule AttoLink.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:guardian, "~> 2.0"},
       {:poison, "~> 4.0"},
+      {:ecto_enum, "~> 1.4.0"},
       {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end

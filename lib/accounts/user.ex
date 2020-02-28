@@ -1,3 +1,15 @@
+# Enum to determine the users subscription type.
+import EctoEnum
+
+defenum(Plan,
+  :plan,
+  [:free,
+  :basic,
+  :premium,
+  :enterprise,]
+)
+
+
 defmodule AttoLink.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
@@ -8,16 +20,17 @@ defmodule AttoLink.Accounts.User do
     field :email, :string
     field :password_hash, :string
     field :password, :string, virtual: true
+    field :plan, Plan, default: :free
     has_many :api_keys, Accounts.Api
-
     timestamps()
   end
 
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password])
-    |> validate_required([:email, :password])
+    |> cast(attrs, [:email, :password, :plan])
+    |> validate_required([:email, :password,])
+    |> unique_constraint(:email)
     |> put_password_hash
   end
 

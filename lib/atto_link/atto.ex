@@ -7,8 +7,8 @@ defmodule AttoLink.Atto do
   alias AttoLink.Repo
   alias LinkPreview
   alias AttoLink.Atto.Preview
+  alias AttoLink.Accounts.User
 
-  @compile :nowarn_unused_vars
   @doc """
   Returns the list of preview.
 
@@ -63,20 +63,42 @@ defmodule AttoLink.Atto do
 
   @todo "0.0.1": "Save html page instead/save html page too"
   @todo "add @spec and @moduledoc"
-  def cache_preview(%LinkPreview.Page{original_url: original_url} = attrs) do
-    save_html_page(original_url)
-
-    Preview.changeset(%Preview{}, Map.from_struct(attrs)) |> Repo.insert()
+  def cache_preview(
+        %User{email: email, id: _id, plan: _plan},
+        %LinkPreview.Page{original_url: _original_url} = attrs
+      ) do
+    with :ok <- save_html_page(email, attrs) do
+      Preview.changeset(%Preview{}, Map.from_struct(attrs)) |> Repo.insert()
+    else
+      {:deny, limit} -> {:deny, :exceeded_cache_limit, limit}
+      {:error, reason} -> {:error, reason}
+      error -> error
+    end
   end
 
-  defp save_html_page(original_url) do
-    # {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
-    # {:ok, file} = File.open("helloworld.html", [:write, :read, :utf8])
-    # # IO.puts body
-    # # IO.write(file, body)
-    # # {:ok, pid} = IO.read(file, :all)
-    # # IO.puts "file"
-    # # IO.inspect pid
+  @spec save_html_page(String.t(), LinkPreview.Page.t()) :: :ok | {:error, :enoent}
+  defp save_html_page(email, %LinkPreview.Page{original_url: original_url, title: title}) do
+    {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
+    # get a reference to the file in question.
+    path = Path.expand("./www/app/files/user/#{email}/")
+    if File.exists?(path) do
+      #if the file already exists save it
+
+
+      [path, "#{title}.html"] |> Path.join |> Path.absname |> File.write(body, [:write, :utf8])
+    else
+      # since the file doesn't exist, generate it
+      #generate the folder
+      IO.puts "Hello World"
+      path = Path.expand("./www/app/files/user/#{email}") |> Path.absname
+      IO.puts path
+      with :ok <- File.mkdir_p(path) do
+        [path, "#{title}.html"] |> Path.join |> File.write(body, [:write, :utf8])
+
+      else
+       err -> err
+      end
+    end
   end
 
   @doc """

@@ -34,6 +34,4 @@ defmodule AttoLinkWeb.PreviewView do
       limit: limit
     }
   end
-
-
 end

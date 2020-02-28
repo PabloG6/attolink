@@ -29,7 +29,8 @@ config :tesla, adapter: Tesla.Adapter.Hackney
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 config :hammer,
-  backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10, pool_size: 2]}
+  backend:
+    {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10, pool_size: 2]}
 
 config :atto_link, AttoLink.Auth.Guardian,
   issuer: "atto_link",

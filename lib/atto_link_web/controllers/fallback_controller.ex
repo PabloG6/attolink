@@ -33,11 +33,4 @@ defmodule AttoLinkWeb.FallbackController do
     |> put_view(AttoLinkWeb.ErrorView)
     |> render(:"404")
   end
-
-  def call(conn, _error) do
-    conn
-    |> put_status(:unauthorized)
-    |> put_view(AttoLinkWeb.ErrorView)
-    |> render(:"401")
-  end
 end
