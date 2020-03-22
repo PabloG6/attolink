@@ -115,9 +115,15 @@ defmodule AttoLink.Accounts do
     User.changeset(user, %{})
   end
 
+  @spec authenticate_user(User.t()) :: any
   def authenticate_user(%User{email: email, password: password}) do
     Repo.get_by(User, email: email)
     |> check_pass(password)
+  end
+
+  @spec get_by(any()) :: any
+  def get_by(info) do
+    Repo.get_by(User, info)
   end
 
   alias AttoLink.Accounts.Api
@@ -198,5 +204,21 @@ defmodule AttoLink.Accounts do
   """
   def delete_api(%Api{} = api) do
     Repo.delete(api)
+  end
+
+  @doc """
+  returns a user based on an api key.
+
+  iex> get_user_by_api_key(api_key)
+  %User{}
+
+  """
+
+  def get_user_by_api_key(api_key) do
+    api =
+      Repo.get_by(Api, api_key: api_key)
+      |> Repo.preload(:user)
+
+    api.user
   end
 end

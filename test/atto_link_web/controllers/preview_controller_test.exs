@@ -11,9 +11,10 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   end
 
   describe "create preview" do
-    setup [:authenticate_user]
+    setup [:authenticate_user, :authenticate_api]
 
-    test "renders preview when data is valid", %{conn: conn} do
+    test "renders preview when data is valid", %{conn: conn, key: key} do
+      conn = put_req_header(conn, "api_key", key.api_key)
 
       conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url)
 
@@ -26,7 +27,9 @@ defmodule AttoLinkWeb.PreviewControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
-    test "caches web page and renders preview when data is valid", %{conn: conn} do
+    test "caches web page and renders preview when data is valid", %{conn: conn, key: key} do
+      conn = put_req_header(conn, "api_key", key.api_key)
+
       conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url, cacheUrl: true)
 
       assert %{
@@ -40,38 +43,38 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   end
 
   describe "create preview with unauthenticated user" do
-    test "renders error when user is not logged in", %{conn: conn} do
+    setup [:authenticate_api]
+
+    test "renders error when user is not logged in", %{conn: conn, key: key} do
+
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
       assert json_response(conn, 401) == %{"message" => "unauthenticated"}
     end
   end
 
   describe "check api limiter with authenticated user" do
-    setup [:authenticate_user]
-    test "renders error when user is not logged in", %{conn: conn, user: user} do
+    setup [:authenticate_api]
 
-      {:ok, token, _} = AttoLink.Auth.Guardian.encode_and_sign(user)
-
+    test "renders error when user is not logged in", %{conn: conn, user: user, key: key} do
 
       # call this connection four times.
-      conn = build_conn() |> put_req_header("authorization", "bearer: "<> token)
+      conn = build_conn() |> put_req_header("api_key",  key.api_key)
+      conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
+
+      conn = build_conn() |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
 
-      conn = build_conn() |> put_req_header("authorization", "bearer: "<> token)
+      conn = build_conn() |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-
-      conn = build_conn() |> put_req_header("authorization", "bearer: "<> token)
+      conn = build_conn() |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-
-      conn = build_conn() |> put_req_header("authorization", "bearer: "<> token)
-      conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
-
-      assert json_response(conn, 429)
+      assert json_response(conn, 200)
     end
   end
+
   defp authenticate_user(%{conn: conn}) do
     {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
     {:ok, token, _claims} = AttoLink.Auth.Guardian.encode_and_sign(user)
@@ -81,5 +84,11 @@ defmodule AttoLinkWeb.PreviewControllerTest do
       |> put_req_header("authorization", "bearer: " <> token)
 
     {:ok, conn: conn, user: user}
+  end
+
+  defp authenticate_api(%{conn: conn}) do
+    {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+    {:ok, key} = Accounts.create_api(%{user_id: user.id})
+    {:ok, conn: conn, user: user, key: key}
   end
 end

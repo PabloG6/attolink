@@ -40,6 +40,7 @@
   "ranch": {:hex, :ranch, "1.7.1", "6b1fab51b49196860b733a49c07604465a47bdb78aa10c1c16a3d199f7f8c881", [:rebar3], [], "hexpm", "451d8527787df716d99dc36162fca05934915db0b6141bbdac2ea8d3c7afc7d7"},
   "rustler": {:hex, :rustler, "0.21.0", "68cc4fc015d0b9541865ea78e78e9ef2dd91ee4be80bf543fd15791102a45aca", [:mix], [{:toml, "~> 0.5.2", [hex: :toml, repo: "hexpm", optional: false]}], "hexpm", "e5429378c397f37f1091a35593b153aee1925e197c6842d04648d802edb52f80"},
   "secure_random": {:hex, :secure_random, "0.5.1", "c5532b37c89d175c328f5196a0c2a5680b15ebce3e654da37129a9fe40ebf51b", [:mix], [], "hexpm", "1b9754f15e3940a143baafd19da12293f100044df69ea12db5d72878312ae6ab"},
+  "size": {:hex, :size, "0.1.0", "49c4bc026286b1f66f9d6b78756e833150b0b86b640d8e3fd5ad597e705dc846", [:mix], [], "hexpm", "013cb9755a95cc085ab960a99bd9f7fde67d6422be3bc06a2d2f55d48b8762c5"},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.5", "6eaf7ad16cb568bb01753dbbd7a95ff8b91c7979482b95f38443fe2c8852a79b", [:make, :mix, :rebar3], [], "hexpm", "13104d7897e38ed7f044c4de953a6c28597d1c952075eb2e328bc6d6f2bfc496"},
   "telemetry": {:hex, :telemetry, "0.4.1", "ae2718484892448a24470e6aa341bc847c3277bfb8d4e9289f7474d752c09c7f", [:rebar3], [], "hexpm", "4738382e36a0a9a2b6e25d67c960e40e1a2c95560b9f936d8e29de8cd858480f"},
   "tempfile": {:hex, :tempfile, "0.1.0", "2964afa1f653d133c61a818c84bb1b3c1a9c8e2f9f8489accb2e9c68cd0c1688", [:mix], [], "hexpm", "e6e505207616d1bb77e85ac4b4d9a11437ed1eb58eb06e99c582498602a9a45b"},

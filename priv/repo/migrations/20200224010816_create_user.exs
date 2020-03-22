@@ -8,5 +8,7 @@ defmodule AttoLink.Repo.Migrations.CreateUser do
       add :id, :binary_id, primary_key: true
       timestamps()
     end
+
+    create unique_index(:user, [:email])
   end
 end

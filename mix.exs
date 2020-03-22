@@ -49,6 +49,7 @@ defmodule AttoLink.MixProject do
       {:guardian, "~> 2.0"},
       {:poison, "~> 4.0"},
       {:ecto_enum, "~> 1.4.0"},
+      {:size, "~> 0.1.0"},
       {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end

@@ -3,9 +3,9 @@ defmodule AttoLink.Repo.Migrations.AddPlanColumn do
 
   def up do
     Plan.create_type()
+
     alter table(:user) do
       add :plan, Plan.type(), default: "free"
-
     end
   end
 
@@ -13,4 +13,3 @@ defmodule AttoLink.Repo.Migrations.AddPlanColumn do
     Plan.drop_type()
   end
 end
-

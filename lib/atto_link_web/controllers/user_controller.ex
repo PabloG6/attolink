@@ -3,7 +3,6 @@ defmodule AttoLinkWeb.UserController do
 
   alias AttoLink.Accounts
   alias AttoLink.Accounts.User
-
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do
@@ -15,7 +14,15 @@ defmodule AttoLinkWeb.UserController do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
       |> put_status(:created)
-      |> signup_reply(user)
+      |> verify_user(user)
+    end
+  end
+
+  def login(conn, %{"user" => %{"email" => email, "password" => password}} = user) do
+    with user <- Accounts.get_by(email: email) do
+      conn
+      |> put_status(:ok)
+      |> verify_user(%{user | password: password})
     end
   end
 
@@ -40,15 +47,18 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  @spec signup_reply(Plug.Conn.t(), User.t()) :: Plug.Conn.t()
-  defp signup_reply(conn, user = %User{}) do
-    with {:ok, _reply} <- Accounts.authenticate_user(user),
+  @spec verify_user(conn :: Plug.Conn.t(), user :: User.t()) :: Plug.Conn.t()
+  defp verify_user(conn, user = %User{}) do
+    with {:ok, reply} <- Accounts.authenticate_user(user),
          conn <- AttoLink.Auth.Guardian.Plug.sign_in(conn, user),
          token <- AttoLink.Auth.Guardian.Plug.current_token(conn) do
       conn
       |> put_status(:created)
       |> put_view(AttoLinkWeb.UserView)
       |> render(:login, user: user, token: token)
+    else
+      err ->
+        err
     end
   end
 end
