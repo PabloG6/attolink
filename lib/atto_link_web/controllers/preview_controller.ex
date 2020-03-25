@@ -4,7 +4,6 @@ defmodule AttoLinkWeb.PreviewController do
   alias AttoLink.Atto
   alias AttoLink.Atto.Preview
   action_fallback AttoLinkWeb.FallbackController
-  @dev_preview_plan 100
   def index(conn, _params) do
     preview = Atto.list_preview()
     render(conn, "index.json", preview: preview)
@@ -14,7 +13,6 @@ defmodule AttoLinkWeb.PreviewController do
   @todo "fix this to "
   def create(conn, %{"url" => url, "cacheUrl" => "true"} = _query_params) do
     user = AttoLink.Auth.Api.current_user(conn)
-    IO.puts "hello world"
     %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.plan)
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
@@ -27,6 +25,7 @@ defmodule AttoLinkWeb.PreviewController do
       |> render("show.json", preview: page_preview)
     else
       {:error, %Ecto.Changeset{}} = error ->
+        IO.inspect error
         error
 
       {:error, %LinkPreview.Error{} = error} ->
@@ -50,7 +49,7 @@ defmodule AttoLinkWeb.PreviewController do
 
       {:error, :enospc} ->
         conn
-        |> put_status(:internal_server_error)
+        |> put_status(:forbidden)
         |> put_resp_header("content-type", "application/json")
         |> put_view(AttoLinkWeb.ErrorView)
         |> render(:error, message: "Falied to save your file. You've exceeded your file limit")
@@ -60,12 +59,34 @@ defmodule AttoLinkWeb.PreviewController do
     end
   end
 
-  def create(conn, %{"url" => url} = query_params) do
+  def create(conn, %{"url" => url, "cacheUrl" => "true", "async" => "true"} = params) do
+    user = AttoLink.Auth.Api.current_user(params)
+    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user)
+    with {:allow, _count} <- Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
+        {:ok, %LinkPreview.Page{} = preview} <- LinkPreview.create(url) do
+          spawn(Atto, :cache_preview, [user, preview])
+          conn
+          |> put_status(:created)
+          |> put_resp_header("content-type", "application/json")
+          |> render("show.json", preview: preview)
+        else
+          {:deny, limit} ->
+            conn
+            |> put_status(:forbidden)
+            |> put_resp_header("content-type", "application/json")
+            |> put_view(AttoLinkWeb.ErrorView)
+            |> render(:error, message: "You've exceeded your hourly preview limit", limit: limit)
+          {:error, %LinkPreview.Error{}} = error -> error
+          error -> error
+
+    end
+  end
+
+  def create(conn, %{"url" => url} = _query_params) do
     user = AttoLink.Auth.Api.current_user(conn)
-    IO.inspect query_params
-    IO.puts "hello world"
+    %AttoLink.Atto.Plan{preview_limit: preview_limit} = AttoLink.Atto.Plan.plan_type(user.plan)
     with {:allow, count} <-
-           Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, @dev_preview_plan),
+           Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60,preview_limit),
          {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url) do
       conn
       |> put_status(:ok)

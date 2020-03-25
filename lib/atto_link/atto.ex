@@ -4,11 +4,13 @@ defmodule AttoLink.Atto do
   """
   use TODO
   import Ecto.Query, warn: false
+  import Recase, only: [to_snake: 1]
   alias AttoLink.Repo
   alias LinkPreview
   alias AttoLink.Atto.Preview
   alias AttoLink.Accounts.User
-
+  @user_agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko)
+  Chrome/35.0.1916.47 Safari/537.36"
   @doc """
   Returns the list of preview.
 
@@ -72,20 +74,24 @@ defmodule AttoLink.Atto do
   @todo "0.0.1": "Save html page instead/save html page too"
   @todo "add @spec and @moduledoc"
   def cache_preview(
-        %User{email: email, id: _id, } = user,
+        %User{email: email, id: id, } = user,
         %LinkPreview.Page{original_url: _original_url} = attrs
       ) do
     IO.puts "Cache preview"
     with {:ok, _sum} <- check_html_throttle(user),
         {:ok, path, byte_size} <- save_html_page(email, attrs),
          {:ok, %Preview{}} = result <-
-           Preview.changeset(%Preview{}, Map.from_struct(attrs) |> Enum.into(%{path: path, byte_size: byte_size})) |> Repo.insert() do
+           Preview.changeset(%Preview{}, Map.from_struct(attrs) |> Enum.into(%{path: path, byte_size: byte_size, user_id: id})) |> Repo.insert() do
       result
     else
       {:error, %Ecto.Changeset{}} -> {:error, %Ecto.Changeset{}}
      {:deny, :exceeded_file_store_limit, _limit} = err -> err
-      {:error, reason} -> {:error, reason}
-      error -> error
+      {:error, reason} = err ->
+        IO.inspect err
+        {:error, reason}
+      error ->
+        IO.inspect error
+        error
     end
   end
 
@@ -94,8 +100,9 @@ defmodule AttoLink.Atto do
     #get the size of each folder.
     query = from preview in Preview,
             where: preview.user_id == ^id
-    sum = AttoLink.Repo.aggregate(query, :sum, :byte_size)
+    sum = AttoLink.Repo.aggregate(query, :sum, :byte_size) || 0
     IO.puts "this is the sum #{sum}"
+    IO.puts "storage_limit: #{storage_limit} sum: #{sum}"
     if storage_limit > sum do
       {:ok, sum}
     else
@@ -104,15 +111,25 @@ defmodule AttoLink.Atto do
 
   end
   @spec save_html_page(String.t(), LinkPreview.Page.t()) :: {:ok,  String.t(), non_neg_integer}
-  defp save_html_page(email, %LinkPreview.Page{original_url: original_url, title: title}) do
-    {:ok, %Tesla.Env{body: body}} = Tesla.get(original_url)
+  defp save_html_page(email, %LinkPreview.Page{original_url: original_url, title: title}= link_preview) do
+  IO.inspect link_preview
+  {:ok, %Tesla.Env{body: body}} = case Tesla.get(original_url, headers: [{"User-Agent", @user_agent}, {"accept", "/"}]) do
+      {:ok, %Tesla.Env{status: 200}} = response ->
+        response
+      {:ok, %Tesla.Env{status: 301} = response} ->
+        [{"location", url} | _] = response.headers
+        Tesla.get(url)
+
+    end
+
     # get a reference to the file in question.
     path = Path.expand("./www/app/files/user/#{email}/")
 
     if File.exists?(path) do
       # if the file already exists save it
+      current_time = :os.system_time(:millisecond)
 
-      joined_path = [path, "#{title}.html"]
+      joined_path = [path, "#{title |> to_snake()}_#{current_time}.html"]
       |> Path.join()
       |> Path.absname()
 

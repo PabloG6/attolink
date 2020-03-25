@@ -30,7 +30,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
     test "caches web page and renders preview when data is valid", %{conn: conn, key: key} do
       conn = put_req_header(conn, "api_key", key.api_key)
 
-      conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url, cacheUrl: true)
+      conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url, cacheUrl: "true")
 
       assert %{
                "title" => title,

@@ -3,7 +3,7 @@ defmodule AttoLink.Repo.Migrations.AddPreviewOwnerForUser do
 
   def change do
     alter table(:preview) do
-      add :user_id, references(:user, type: :uuid)
+      add :user_id, references(:user, type: :uuid), null: false
     end
   end
 end

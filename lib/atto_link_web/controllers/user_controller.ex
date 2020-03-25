@@ -18,7 +18,7 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  def login(conn, %{"user" => %{"email" => email, "password" => password}} = user) do
+  def login(conn, %{"user" => %{"email" => email, "password" => password}} = _user) do
     with user <- Accounts.get_by(email: email) do
       conn
       |> put_status(:ok)
@@ -49,7 +49,7 @@ defmodule AttoLinkWeb.UserController do
 
   @spec verify_user(conn :: Plug.Conn.t(), user :: User.t()) :: Plug.Conn.t()
   defp verify_user(conn, user = %User{}) do
-    with {:ok, reply} <- Accounts.authenticate_user(user),
+    with {:ok, _reply} <- Accounts.authenticate_user(user),
          conn <- AttoLink.Auth.Guardian.Plug.sign_in(conn, user),
          token <- AttoLink.Auth.Guardian.Plug.current_token(conn) do
       conn

@@ -17,7 +17,8 @@ defmodule AttoLink.Atto.Preview do
   @doc false
   def changeset(preview, attrs \\ %{}) do
     preview
-    |> cast(attrs, [:description, :images, :original_url, :title, :website_url, :path, :byte_size])
-    |> validate_required([:website_url, :original_url])
+    |> cast(attrs, [:user_id, :description, :images, :original_url, :title, :website_url, :path, :byte_size])
+    |> validate_required([:website_url, :original_url, :user_id])
+
   end
 end
