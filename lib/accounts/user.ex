@@ -18,6 +18,7 @@ defmodule AttoLink.Accounts.User do
     field :password_hash, :string
     field :password, :string, virtual: true
     field :plan, Plan, default: :free
+    field :customer_id, :string
     has_many :api_keys, Accounts.Api
     has_many :previews, AttoLink.Accounts.User
     timestamps()
@@ -26,7 +27,7 @@ defmodule AttoLink.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :plan])
+    |> cast(attrs, [:email, :password, :plan, :customer_id])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
     |> put_password_hash

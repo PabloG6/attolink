@@ -9,10 +9,8 @@ defmodule AttoLinkWeb.PreviewController do
     render(conn, "index.json", preview: preview)
   end
 
-  @todo "fix error message to return appropriate error"
-  @todo "fix this to "
   def create(conn, %{"url" => url, "cacheUrl" => "true"} = _query_params) do
-    user = AttoLink.Auth.Api.current_user(conn)
+    {:ok, user} = AttoLink.Auth.Api.current_user(conn)
     %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.plan)
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
@@ -25,7 +23,6 @@ defmodule AttoLinkWeb.PreviewController do
       |> render("show.json", preview: page_preview)
     else
       {:error, %Ecto.Changeset{}} = error ->
-        IO.inspect error
         error
 
       {:error, %LinkPreview.Error{} = error} ->
@@ -60,7 +57,7 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url, "cacheUrl" => "true", "async" => "true"} = params) do
-    user = AttoLink.Auth.Api.current_user(params)
+    {:ok, user} = AttoLink.Auth.Api.current_user(params)
     %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user)
     with {:allow, _count} <- Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
         {:ok, %LinkPreview.Page{} = preview} <- LinkPreview.create(url) do
@@ -83,7 +80,7 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url} = _query_params) do
-    user = AttoLink.Auth.Api.current_user(conn)
+    {:ok, user} = AttoLink.Auth.Api.current_user(conn)
     %AttoLink.Atto.Plan{preview_limit: preview_limit} = AttoLink.Atto.Plan.plan_type(user.plan)
     with {:allow, count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60,preview_limit),
@@ -107,7 +104,6 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   @spec exceeded_file_store_limit(Plug.Conn.t(), integer) :: Plug.Conn.t()
-  @todo "Fix this to have a specific error for exceeding file storage"
   defp exceeded_file_store_limit(conn, limit) do
     conn
     |> put_status(:too_many_requests)
@@ -115,7 +111,6 @@ defmodule AttoLinkWeb.PreviewController do
     |> render(:too_many_requests, limit: limit, limit_type: :too_many_file_saves)
   end
 
-  @todo "Fix this to return data saved in database along side user who saved it."
   def show(conn, %{"url" => url}) do
     preview = Atto.get_preview!(url)
 

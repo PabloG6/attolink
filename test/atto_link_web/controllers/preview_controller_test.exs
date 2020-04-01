@@ -1,21 +1,18 @@
 defmodule AttoLinkWeb.PreviewControllerTest do
   use AttoLinkWeb.ConnCase
 
-  alias AttoLink.Atto
-  alias AttoLink.Atto.Preview
   alias AttoLink.Accounts
   @valid_url "https://pusher.com/"
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
-
+  @tag :preview
   describe "create preview" do
     setup [:authenticate_user, :authenticate_api]
 
     test "renders preview when data is valid", %{conn: conn, key: key} do
       conn = put_req_header(conn, "api_key", key.api_key)
-
       conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url)
 
       assert %{
@@ -26,6 +23,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
                "original_url" => original_url
              } = json_response(conn, 200)["data"]
     end
+    @tag :preview
 
     test "caches web page and renders preview when data is valid", %{conn: conn, key: key} do
       conn = put_req_header(conn, "api_key", key.api_key)
@@ -45,30 +43,30 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   describe "create preview with unauthenticated user" do
     setup [:authenticate_api]
 
-    test "renders error when user is not logged in", %{conn: conn, key: key} do
+    test "renders error when user is not logged in", %{conn: conn} do
 
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
-      assert json_response(conn, 401) == %{"message" => "unauthenticated"}
+      assert json_response(conn, 401) ==   %{"message" => "You either have no api key or this is an unregistered api key", "response_code" => "unregistered_api_key"}
     end
   end
 
   describe "check api limiter with authenticated user" do
     setup [:authenticate_api]
 
-    test "renders error when user is not logged in", %{conn: conn, user: user, key: key} do
+    test "renders error when user is not logged in", %{conn: conn, key: key} do
 
       # call this connection four times.
-      conn = build_conn() |> put_req_header("api_key",  key.api_key)
+      conn = recycle(conn) |> put_req_header("api_key",  key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-      conn = build_conn() |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
 
-      conn = build_conn() |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-      conn = build_conn() |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
       assert json_response(conn, 200)

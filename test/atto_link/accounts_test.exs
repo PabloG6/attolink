@@ -76,7 +76,7 @@ defmodule AttoLink.AccountsTest do
 
     def api_fixture(attrs \\ %{}) do
       {:ok, user} = Accounts.create_user(%{email: "some email", password: "password"})
-      lol = %{user_id: user.id} |> Enum.into(@valid_attrs)
+      lol = %{user_id: user.id} |> Enum.into(@valid_attrs) |> Enum.into(attrs)
 
       {:ok, api} =
         lol
@@ -102,7 +102,7 @@ defmodule AttoLink.AccountsTest do
     end
 
     test "create_api/1 with invalid data returns error changeset" do
-      {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+      {:ok, _user} = Accounts.create_user(%{email: "some email", password: "some password"})
       assert {:error, %Ecto.Changeset{}} = Accounts.create_api(%{})
     end
 
@@ -110,6 +110,76 @@ defmodule AttoLink.AccountsTest do
       api = api_fixture()
       assert {:ok, %Api{}} = Accounts.delete_api(api)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_api!(api.id) end
+    end
+  end
+
+  describe "whitelist" do
+    alias AttoLink.Accounts.WhiteList
+    alias AttoLink.Accounts.User
+    @valid_attrs %{ip_address: "some ip_address"}
+    @update_attrs %{ip_address: "some updated ip_address"}
+    @invalid_attrs %{ip_address: nil}
+
+    def white_list_fixture(attrs \\ %{}) do
+      {:ok, white_list} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Accounts.create_white_list()
+
+      white_list
+    end
+
+
+
+    test "list_whitelist/0 returns all whitelist" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id})
+      assert Accounts.list_whitelist() == [white_list]
+    end
+
+    test "get_white_list!/1 returns the white_list with given id" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id})
+
+      assert Accounts.get_white_list!(white_list.id) == white_list
+    end
+
+    test "create_white_list/1 with valid data creates a white_list" do
+      %User{id: id} = user_fixture()
+
+      assert {:ok, %WhiteList{} = white_list} = Accounts.create_white_list(%{user_id: id, ip_address: "some ip_address"})
+      assert white_list.ip_address == "some ip_address"
+    end
+
+    test "create_white_list/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_white_list(@invalid_attrs)
+    end
+
+    test "update_white_list/2 with valid data updates the white_list" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id})
+      assert {:ok, %WhiteList{} = white_list} = Accounts.update_white_list(white_list, %{user_id: id} |> Enum.into(@update_attrs))
+    end
+
+    test "update_white_list/2 with invalid data returns error changeset" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id, ip_address: "ip address"})
+      uuid = Ecto.UUID.generate()
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_white_list(white_list, %{user_id: uuid, ip_address: "ip addressj"})
+      assert white_list == Accounts.get_white_list!(white_list.id)
+    end
+
+    test "delete_white_list/1 deletes the white_list" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id, ip_address: "ip address"})
+      assert {:ok, %WhiteList{}} = Accounts.delete_white_list(white_list)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_white_list!(white_list.id) end
+    end
+
+    test "change_white_list/1 returns a white_list changeset" do
+      %User{id: id} = user_fixture()
+      white_list = white_list_fixture(%{user_id: id})
+      assert %Ecto.Changeset{} = Accounts.change_white_list(white_list)
     end
   end
 end

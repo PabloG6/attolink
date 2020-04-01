@@ -8,18 +8,18 @@ defmodule AttoLink.Atto.Plan do
   end
 
   def plan_type(:basic) do
-    %AttoLink.Atto.Plan{preview_limit: 1500, storage_limit: 3_221_225_472, request_limit: 4000, request_overage: 0.06, price: 7.00}
+    %AttoLink.Atto.Plan{preview_limit: 4000, storage_limit: 1_073_741_824, request_limit: 4000, request_overage: 0.06, price: 10.00}
 
   end
 
   @doc """
-  1500 requests per hour -> 540 megabytes a month maximum
+  15000 requests per hour -> 540 megabytes a month maximum
   storage_limit 16 gib -> 0.02 * 16 -> 32 cents a month
   request_limit: 7000 requests at 3.5 megabytes -> 24.5 gigabytes -> 14 cents
 
   """
   def plan_type(:premium) do
-    %AttoLink.Atto.Plan{preview_limit: 7500, storage_limit: 16_106_127_360, request_limit:  20000, request_overage: 0.04, price: 25}
+    %AttoLink.Atto.Plan{preview_limit: 25000, storage_limit: 16_106_127_360, request_limit:  20000, request_overage: 0.04, price: 25}
   end
 
 

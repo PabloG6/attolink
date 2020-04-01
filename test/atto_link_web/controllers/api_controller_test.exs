@@ -2,13 +2,8 @@ defmodule AttoLinkWeb.ApiControllerTest do
   use AttoLinkWeb.ConnCase
   use TODO
   alias AttoLink.Accounts
-  alias AttoLink.Accounts.Api
 
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
-  @todo "0.0.1": "Fix this to log in with guardian and use the key from that to get the user id."
-  def fixture(user = %Accounts.User{id: id}) do
+  def fixture(%Accounts.User{id: id}) do
     {:ok, api} = Accounts.create_api(%{user_id: id})
     api
   end
@@ -29,7 +24,7 @@ defmodule AttoLinkWeb.ApiControllerTest do
   describe "create api when user is unauthorized" do
     setup [:create_user, :sign_in_user]
 
-    test "renders api when data is valid", %{conn: conn, user: user} do
+    test "renders api when data is valid", %{conn: conn, user: _user} do
       conn = post(conn, Routes.api_path(conn, :create))
 
       assert %{"id" => id, "user_id" => user_id, "api_key" => api_key} =

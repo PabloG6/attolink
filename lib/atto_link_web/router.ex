@@ -18,7 +18,10 @@ defmodule AttoLinkWeb.Router do
     plug AttoLink.Auth.Api
   end
 
-  @todo "0.0.1": "Create a login"
+  pipeline :white_list do
+    plug AttoLink.Plug.WhiteList
+  end
+
   scope "/", AttoLinkWeb do
     pipe_through [:api]
     post "/signup", UserController, :create
@@ -29,10 +32,13 @@ defmodule AttoLinkWeb.Router do
     pipe_through [:api, :auth]
     resources "/user", UserController, except: [:new, :edit, :create]
     resources "/keys", ApiController, except: [:new, :edit]
+    resources "/whitelist", WhiteListController, except: [:new, :edit]
+    resources "/subscriptions", SubscriptionController, except: [:new, :edit]
+    resources "/account", PermissionsController, except: [:new, :edit]
   end
 
-  scope "/api", AttoLinkWeb do
-    pipe_through [:api, :api_auth]
+  scope "/v1", AttoLinkWeb do
+    pipe_through [:api, :white_list, :api_auth]
     get "/preview", PreviewController, :create
   end
 

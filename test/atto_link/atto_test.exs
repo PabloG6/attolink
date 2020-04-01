@@ -4,7 +4,6 @@ defmodule AttoLink.AttoTest do
   alias AttoLink.Atto
 
   describe "preview" do
-    alias AttoLink.Atto.Preview
 
     @valid_url "https://pusher.com/tutorials/collaborative-text-editor-javascript"
 
