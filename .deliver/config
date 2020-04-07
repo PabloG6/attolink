@@ -1,4 +1,16 @@
-PP="atto_link"
+APP="atto_link"
 BUILD_HOST="api.teenielink.dev"
-BUILD_USER="pabbyg"                                                                                     BUILD_AT="/home/sammy/atto_link_build"                                                                  PRODUCTION_HOSTS="api.teenielink.dev"                                                                   PRODUCTION_USER="pabbyg"                                                                                DELIVER_TO="/home/sammy/app_release"                                                                    pre_erlang_get_and_update() {                                                                           local _prod_secret_path='/home/pabbyg/atto_link/prod.secret.exs'                                        if [ "$TARGET_MIX_ENV" = "prod" ]; then                                                                         __sync_remote "                                                                                         ln -sgn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'                                         "                                                                                                                                                                                                       fi                                                                                                      }    
+BUILD_USER="sammy"
+BUILD_AT="/home/pabbyg/atto_link"
+PRODUCTION_HOSTS="api.teenielink.dev"
+PRODUCTION_USER="sammy"
+DELIVER_TO="home/pabbyg/app_release"
 
+pre_erlang_get_and_update_deps() {
+  local _prod_secret_path="/home/sammy/app_config/prod.secret.exs"
+  if [ "$TARGET_MIX_ENV" = "prod" ]; then
+    __sync_remote "
+      ln -sfn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'
+    "
+  fi
+}
