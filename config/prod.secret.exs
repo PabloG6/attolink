@@ -30,6 +30,7 @@ config :atto_link, AttoLinkWeb.Endpoint,
   ],
   secret_key_base: secret_key_base
 
+config :stripity_stripe, api_key: System.get_env("STRIPE_SECRET")
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

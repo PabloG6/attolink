@@ -3,7 +3,6 @@ defmodule AttoLinkWeb.UserController do
 
   alias AttoLink.Accounts
   alias AttoLink.Accounts.User
-  alias AttoLink.Payments
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do

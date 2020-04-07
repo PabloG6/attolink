@@ -52,6 +52,8 @@ defmodule AttoLink.MixProject do
       {:size, "~> 0.1.0"},
       {:recase, "~> 0.5"},
       {:stripity_stripe, git: "https://github.com/PabloG6/stripity_stripe", ref: "efe9e221dffb104e2deb5dbd2d1e435a069b02e5"},
+      {:edeliver, "~> 1.4.3"},
+      {:distillery, "~> 1.4"},
       {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end

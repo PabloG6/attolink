@@ -1,7 +1,6 @@
 defmodule AttoLinkWeb.SubscriptionController do
   use AttoLinkWeb, :controller
 
-  alias AttoLink.Payments
 
   action_fallback AttoLinkWeb.FallbackController
 

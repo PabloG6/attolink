@@ -29,3 +29,5 @@ atto_link-*.tar
 /.vscode/
 /www/
 /.elixir_ls/
+
+.deliver/releases
