@@ -5,11 +5,12 @@ defmodule AttoLink.MixProject do
     [
       app: :atto_link,
       version: "0.1.0",
-      elixir: "~> 1.5",
+      elixir: "~> 1.10.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      release: releases(),
       deps: deps()
     ]
   end
@@ -17,10 +18,20 @@ defmodule AttoLink.MixProject do
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.
+  defp releases do
+    [
+      staging: [
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent],
+        path: "./releases",
+      ]
+    ]
+  end
+
   def application do
     [
       mod: {AttoLink.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :edeliver]
     ]
   end
 
@@ -50,10 +61,11 @@ defmodule AttoLink.MixProject do
       {:poison, "~> 4.0"},
       {:ecto_enum, "~> 1.4.0"},
       {:size, "~> 0.1.0"},
+      {:edeliver, ">= 1.6.0"},
+      {:distillery, "~> 2.0", warn_missing: false},
       {:recase, "~> 0.5"},
       {:stripity_stripe, git: "https://github.com/PabloG6/stripity_stripe", ref: "efe9e221dffb104e2deb5dbd2d1e435a069b02e5"},
-      {:edeliver, "~> 1.4.3"},
-      {:distillery, "~> 1.4"},
+
       {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end

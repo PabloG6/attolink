@@ -1,16 +1,34 @@
+#!/bin/bash
+
 APP="atto_link"
 BUILD_HOST="api.teenielink.dev"
-BUILD_USER="sammy"
-BUILD_AT="/home/pabbyg/atto_link"
+BUILD_USER="deploy"
+BUILD_AT="/tmp/edeliver/$APP/builds/"
+
+START_DEPLOY=true
+CLEAN_DEPLOY=true
+
+
 PRODUCTION_HOSTS="api.teenielink.dev"
-PRODUCTION_USER="sammy"
-DELIVER_TO="home/pabbyg/app_release"
+PRODUCTION_USER="deploy"
+DELIVER_TO="home/deploy/phx/apps/"
+AUTO_VERSION=revision
+
+PRODUCTION_HOSTS="api.teenielink.dev"
 
 pre_erlang_get_and_update_deps() {
-  local _prod_secret_path="/home/sammy/app_config/prod.secret.exs"
+  local _prod_secret_path="/home/deploy/app_config/prod.secret.exs"
   if [ "$TARGET_MIX_ENV" = "prod" ]; then
     __sync_remote "
-      ln -sfn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'
+    [ -f ~/.profile ] && source ~/.profile
+    set -e
+    # prepare something
+    mkdir -p priv/static
+
+    mkdir -p '$BUILD_AT'
+
+    ln -sfn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'
     "
   fi
 }
+

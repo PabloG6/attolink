@@ -11,10 +11,18 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
+
+stripe_test_key =
+  System.get_env("STRIPE_SECRET_KEY") ||
+  raise """
+  environment variable STRIPE_SECRET_KEY is missing.
+
+  """
+
 config :atto_link, AttoLink.Repo,
   # ssl: true,
   url: database_url,
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15")
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||
@@ -30,7 +38,8 @@ config :atto_link, AttoLinkWeb.Endpoint,
   ],
   secret_key_base: secret_key_base
 
-config :stripity_stripe, api_key: System.get_env("STRIPE_SECRET")
+config :stripity_stripe, api_key: stripe_test_key
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

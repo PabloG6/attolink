@@ -31,3 +31,10 @@ atto_link-*.tar
 /.elixir_ls/
 
 .deliver/releases
+
+.tool-versions
+
+/config/prod.secret.exs 
+
+/rel/
+
