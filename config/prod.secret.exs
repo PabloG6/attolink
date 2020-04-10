@@ -19,9 +19,31 @@ stripe_test_key =
 
   """
 
+username = System.get_env("DB_USERNAME") || 
+	  raise """ 
+	environment variable DB_USERNAME is  missing
+	"""
+
+password = System.get_env("DB_PASSWORD") || 
+           raise """
+           environment variable DB_PASSWORD is missing
+           """
+
+
+database = System.get_env("DB_NAME")  || 
+           raise """
+           environment variable DB_NAME is missing
+           """
+
+hostname = "localhost"
+
 config :atto_link, AttoLink.Repo,
   # ssl: true,
-  url: database_url,
+  username: username,
+  password: password,
+  database: database,
+  hostname: hostname, 
+ 
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15")
 
 secret_key_base =

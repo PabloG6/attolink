@@ -10,7 +10,7 @@ defmodule AttoLink.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      release: releases(),
+      releases: releases(),
       deps: deps()
     ]
   end
@@ -23,7 +23,7 @@ defmodule AttoLink.MixProject do
       staging: [
         include_executables_for: [:unix],
         applications: [runtime_tools: :permanent],
-        path: "./releases",
+        path: "/home/deploy/phx/atto_link/releases",
       ]
     ]
   end

@@ -11,7 +11,6 @@ use Mix.Config
 # before starting your production server.
 config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "api.teenielink.dev", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json",
   code_reloader: false
 
 # Do not print debug messages in production
