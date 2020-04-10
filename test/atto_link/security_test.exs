@@ -11,7 +11,8 @@ defmodule AttoLink.SecurityTest do
     @invalid_attrs %{enable_whitelist: :unknown_param}
 
     def permissions_fixture(attrs \\ %{}) do
-      {:ok, user} = AttoLink.Accounts.create_user(%{email: "random@email.com", password: "radsfjal"})
+      {:ok, user} =
+        AttoLink.Accounts.create_user(%{email: "random@email.com", password: "radsfjal"})
 
       {:ok, permissions} =
         attrs
@@ -33,8 +34,14 @@ defmodule AttoLink.SecurityTest do
     end
 
     test "create_permissions/1 with valid data creates a permissions" do
-      {:ok, user} = AttoLink.Accounts.create_user(%{email: "fsdaflk@email.com", password: "salfjroiedfaslrkeicmgres"})
-      assert {:ok, %Permissions{} = permissions} = Security.create_permissions(@valid_attrs |> Enum.into(%{user_id: user.id}))
+      {:ok, user} =
+        AttoLink.Accounts.create_user(%{
+          email: "fsdaflk@email.com",
+          password: "salfjroiedfaslrkeicmgres"
+        })
+
+      assert {:ok, %Permissions{} = permissions} =
+               Security.create_permissions(@valid_attrs |> Enum.into(%{user_id: user.id}))
     end
 
     test "create_permissions/1 with invalid data returns error changeset" do
@@ -43,12 +50,17 @@ defmodule AttoLink.SecurityTest do
 
     test "update_permissions/2 with valid data updates the permissions" do
       permissions = permissions_fixture()
-      assert {:ok, %Permissions{} = permissions} = Security.update_permissions(permissions, @update_attrs)
+
+      assert {:ok, %Permissions{} = permissions} =
+               Security.update_permissions(permissions, @update_attrs)
     end
 
     test "update_permissions/2 with invalid data returns error changeset" do
       permissions = permissions_fixture()
-      assert {:error, %Ecto.Changeset{}} = Security.update_permissions(permissions, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Security.update_permissions(permissions, @invalid_attrs)
+
       assert permissions == Security.get_permissions!(permissions.id)
     end
 

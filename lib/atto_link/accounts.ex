@@ -217,17 +217,17 @@ defmodule AttoLink.Accounts do
   def get_user_by_api_key(nil) do
     {:error, :no_user}
   end
+
   @spec get_user_by_api_key(api_key :: String.t() | nil) :: {:ok, %User{}} | {:error, :no_user}
   def get_user_by_api_key(api_key) do
     with %Api{} = api <-
-      Repo.get_by(Api, api_key: api_key)
-      |> Repo.preload(:user) do
-        {:ok, api.user}
-       else
-        nil ->
-          {:error, :no_user}
-       end
-
+           Repo.get_by(Api, api_key: api_key)
+           |> Repo.preload(:user) do
+      {:ok, api.user}
+    else
+      nil ->
+        {:error, :no_user}
+    end
   end
 
   alias AttoLink.Accounts.WhiteList
@@ -260,7 +260,6 @@ defmodule AttoLink.Accounts do
 
   """
   def get_white_list!(id), do: Repo.get!(WhiteList, id)
-
 
   @doc """
   Creates a white_list.
@@ -327,13 +326,13 @@ defmodule AttoLink.Accounts do
     WhiteList.changeset(white_list, %{})
   end
 
- @spec verify_white_list(ip :: String.t(), AttoLink.Accounts.User.t()) :: {:ok, AttoLink.Accounts.WhiteList.t()} | {:error, :unverified_ip}
+  @spec verify_white_list(ip :: String.t(), AttoLink.Accounts.User.t()) ::
+          {:ok, AttoLink.Accounts.WhiteList.t()} | {:error, :unverified_ip}
   def verify_white_list(ip, %User{id: id}) do
-    with %WhiteList{} = white_list<- Repo.get_by(WhiteList, ip_address: ip, user_id: id) do
+    with %WhiteList{} = white_list <- Repo.get_by(WhiteList, ip_address: ip, user_id: id) do
       {:ok, white_list}
     else
       nil -> {:error, :unverified_ip}
     end
-
   end
 end

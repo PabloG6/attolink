@@ -40,6 +40,4 @@ defmodule AttoLinkWeb.Router do
     pipe_through [:api, :white_list, :api_auth]
     get "/preview", PreviewController, :create
   end
-
-
 end

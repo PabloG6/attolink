@@ -36,14 +36,16 @@ defmodule AttoLink.Security do
 
   """
   def get_permissions!(id), do: Repo.get!(Permissions, id)
+
   def get_permissions_by!(info \\ []) do
-    with %Permissions{} = permissions<- Repo.get_by(Permissions, info) do
+    with %Permissions{} = permissions <- Repo.get_by(Permissions, info) do
       {:ok, permissions}
     else
       nil ->
         {:error, :no_permissions}
     end
   end
+
   @doc """
   Creates a permissions.
 

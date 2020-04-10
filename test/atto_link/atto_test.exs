@@ -4,7 +4,6 @@ defmodule AttoLink.AttoTest do
   alias AttoLink.Atto
 
   describe "preview" do
-
     @valid_url "https://pusher.com/tutorials/collaborative-text-editor-javascript"
 
     def preview_fixture(url) do
@@ -19,6 +18,4 @@ defmodule AttoLink.AttoTest do
       assert {:ok, %LinkPreview.Page{} = preview} = Atto.create_preview(@valid_url)
     end
   end
-
-
 end

@@ -13,7 +13,9 @@ defmodule AttoLinkWeb.WhiteListController do
 
   def create(conn, %{"white_list" => white_list_params}) do
     user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
-    with {:ok, %WhiteList{} = white_list} <- Accounts.create_white_list(white_list_params |> Enum.into(%{"user_id" => user.id})) do
+
+    with {:ok, %WhiteList{} = white_list} <-
+           Accounts.create_white_list(white_list_params |> Enum.into(%{"user_id" => user.id})) do
       conn
       |> put_status(:created)
       |> render("show.json", white_list: white_list)
@@ -28,7 +30,8 @@ defmodule AttoLinkWeb.WhiteListController do
   def update(conn, %{"id" => id, "white_list" => white_list_params}) do
     white_list = Accounts.get_white_list!(id)
 
-    with {:ok, %WhiteList{} = white_list} <- Accounts.update_white_list(white_list, white_list_params) do
+    with {:ok, %WhiteList{} = white_list} <-
+           Accounts.update_white_list(white_list, white_list_params) do
       render(conn, "show.json", white_list: white_list)
     end
   end

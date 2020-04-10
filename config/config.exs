@@ -38,5 +38,4 @@ config :atto_link, AttoLink.Auth.Guardian,
 
 config :stripity_stripe, api_key: "sk_test_VjpBvPBlY27yLOXU8r5lZEKi005iVURh37"
 
-
 import_config "#{Mix.env()}.exs"

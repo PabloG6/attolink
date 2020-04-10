@@ -6,8 +6,18 @@ defmodule AttoLink.PaymentsTest do
   describe "subscription" do
     alias AttoLink.Payments.Subscription
 
-    @valid_attrs %{canceled: true, canceled_at: 42, customer: "some customer", subscription_id: "some subscription_id"}
-    @update_attrs %{canceled: false, canceled_at: 43, customer: "some updated customer", subscription_id: "some updated subscription_id"}
+    @valid_attrs %{
+      canceled: true,
+      canceled_at: 42,
+      customer: "some customer",
+      subscription_id: "some subscription_id"
+    }
+    @update_attrs %{
+      canceled: false,
+      canceled_at: 43,
+      customer: "some updated customer",
+      subscription_id: "some updated subscription_id"
+    }
     @invalid_attrs %{canceled: nil, canceled_at: nil, customer: nil, subscription_id: nil}
 
     def subscription_fixture(attrs \\ %{}) do
@@ -43,7 +53,10 @@ defmodule AttoLink.PaymentsTest do
 
     test "update_subscription/2 with valid data updates the subscription" do
       subscription = subscription_fixture()
-      assert {:ok, %Subscription{} = subscription} = Payments.update_subscription(subscription, @update_attrs)
+
+      assert {:ok, %Subscription{} = subscription} =
+               Payments.update_subscription(subscription, @update_attrs)
+
       assert subscription.canceled == false
       assert subscription.canceled_at == 43
       assert subscription.customer == "some updated customer"
@@ -52,7 +65,10 @@ defmodule AttoLink.PaymentsTest do
 
     test "update_subscription/2 with invalid data returns error changeset" do
       subscription = subscription_fixture()
-      assert {:error, %Ecto.Changeset{}} = Payments.update_subscription(subscription, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Payments.update_subscription(subscription, @invalid_attrs)
+
       assert subscription == Payments.get_subscription!(subscription.id)
     end
 

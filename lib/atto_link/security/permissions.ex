@@ -1,9 +1,10 @@
 import EctoEnum
 
-defenum(WhiteListPermissions,
-      :enable_white_list,
-      [:all, :restricted, :none])
-
+defenum(
+  WhiteListPermissions,
+  :enable_white_list,
+  [:all, :restricted, :none]
+)
 
 defmodule AttoLink.Security.Permissions do
   use Ecto.Schema

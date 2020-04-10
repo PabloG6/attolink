@@ -10,6 +10,5 @@ defmodule AttoLink.Repo.Migrations.CreateSubscription do
 
       timestamps()
     end
-
   end
 end

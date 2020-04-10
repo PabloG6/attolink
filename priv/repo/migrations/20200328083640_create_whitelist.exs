@@ -9,6 +9,5 @@ defmodule AttoLink.Repo.Migrations.CreateWhitelist do
     end
 
     create unique_index(:whitelist, [:user_id, :ip_address])
-
   end
 end

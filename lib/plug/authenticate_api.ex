@@ -11,27 +11,27 @@ defmodule AttoLink.Auth.Api do
     |> verify_user()
   end
 
-
-
-
-
-
   defp verify_user(%Plug.Conn{} = conn) do
     with key <- fetch_key(conn),
-        {:ok, %Accounts.User{}} = _user <- Accounts.get_user_by_api_key(key) do
-          conn
+         {:ok, %Accounts.User{}} = _user <- Accounts.get_user_by_api_key(key) do
+      conn
     else
       nil ->
-
         conn
         |> put_resp_header("content-type", "application/json")
         |> resp(401, Poison.encode!(%{message: "unauthenticated"}))
         |> halt()
-      {:error, :no_user} ->
 
+      {:error, :no_user} ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "You either have no api key or this is an unregistered api key", response_code: :unregistered_api_key}))
+        |> resp(
+          401,
+          Poison.encode!(%{
+            message: "You either have no api key or this is an unregistered api key",
+            response_code: :unregistered_api_key
+          })
+        )
         |> send_resp()
         |> halt()
     end
@@ -53,33 +53,19 @@ defmodule AttoLink.Auth.Api do
     |> halt()
   end
 
-
-
-
-
-
-
-
   defp fetch_key(%Plug.Conn{} = conn) do
     case get_req_header(conn, "api_key") do
-     [key | _tail] ->
-      key
+      [key | _tail] ->
+        key
 
       [] = _err ->
         nil
-
-
     end
-
-
   end
 
   @spec current_user(conn :: Plug.Conn.t()) :: {:error, :no_user} | {:ok, any}
   def current_user(conn) do
     key = fetch_key(conn)
-   Accounts.get_user_by_api_key(key)
-
+    Accounts.get_user_by_api_key(key)
   end
-
-
 end

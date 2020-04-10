@@ -5,6 +5,5 @@ defmodule AttoLink.Repo.Migrations.AddCustomerId do
     alter table(:user) do
       add :customer_id, :text, null: true
     end
-
   end
 end

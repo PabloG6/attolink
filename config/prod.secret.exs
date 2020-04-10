@@ -11,29 +11,30 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
-
 stripe_test_key =
   System.get_env("STRIPE_SECRET_KEY") ||
-  raise """
-  environment variable STRIPE_SECRET_KEY is missing.
+    raise """
+    environment variable STRIPE_SECRET_KEY is missing.
 
-  """
+    """
 
-username = System.get_env("DB_USERNAME") || 
-	  raise """ 
-	environment variable DB_USERNAME is  missing
-	"""
+username =
+  System.get_env("DB_USERNAME") ||
+    raise """
+    environment variable DB_USERNAME is  missing
+    """
 
-password = System.get_env("DB_PASSWORD") || 
-           raise """
-           environment variable DB_PASSWORD is missing
-           """
+password =
+  System.get_env("DB_PASSWORD") ||
+    raise """
+    environment variable DB_PASSWORD is missing
+    """
 
-
-database = System.get_env("DB_NAME")  || 
-           raise """
-           environment variable DB_NAME is missing
-           """
+database =
+  System.get_env("DB_NAME") ||
+    raise """
+    environment variable DB_NAME is missing
+    """
 
 hostname = "localhost"
 
@@ -42,8 +43,7 @@ config :atto_link, AttoLink.Repo,
   username: username,
   password: password,
   database: database,
-  hostname: hostname, 
- 
+  hostname: hostname,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15")
 
 secret_key_base =

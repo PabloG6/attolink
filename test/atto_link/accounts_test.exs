@@ -129,8 +129,6 @@ defmodule AttoLink.AccountsTest do
       white_list
     end
 
-
-
     test "list_whitelist/0 returns all whitelist" do
       %User{id: id} = user_fixture()
       white_list = white_list_fixture(%{user_id: id})
@@ -147,7 +145,9 @@ defmodule AttoLink.AccountsTest do
     test "create_white_list/1 with valid data creates a white_list" do
       %User{id: id} = user_fixture()
 
-      assert {:ok, %WhiteList{} = white_list} = Accounts.create_white_list(%{user_id: id, ip_address: "some ip_address"})
+      assert {:ok, %WhiteList{} = white_list} =
+               Accounts.create_white_list(%{user_id: id, ip_address: "some ip_address"})
+
       assert white_list.ip_address == "some ip_address"
     end
 
@@ -158,14 +158,19 @@ defmodule AttoLink.AccountsTest do
     test "update_white_list/2 with valid data updates the white_list" do
       %User{id: id} = user_fixture()
       white_list = white_list_fixture(%{user_id: id})
-      assert {:ok, %WhiteList{} = white_list} = Accounts.update_white_list(white_list, %{user_id: id} |> Enum.into(@update_attrs))
+
+      assert {:ok, %WhiteList{} = white_list} =
+               Accounts.update_white_list(white_list, %{user_id: id} |> Enum.into(@update_attrs))
     end
 
     test "update_white_list/2 with invalid data returns error changeset" do
       %User{id: id} = user_fixture()
       white_list = white_list_fixture(%{user_id: id, ip_address: "ip address"})
       uuid = Ecto.UUID.generate()
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_white_list(white_list, %{user_id: uuid, ip_address: "ip addressj"})
+
+      assert {:error, %Ecto.Changeset{}} =
+               Accounts.update_white_list(white_list, %{user_id: uuid, ip_address: "ip addressj"})
+
       assert white_list == Accounts.get_white_list!(white_list.id)
     end
 

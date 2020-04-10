@@ -5,8 +5,7 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   alias AttoLink.Accounts.WhiteList
 
   @create_attrs %{
-    ip_address: "some ip_address",
-
+    ip_address: "some ip_address"
   }
   @update_attrs %{
     ip_address: "some updated ip_address"
@@ -14,7 +13,9 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   @invalid_attrs %{ip_address: nil}
 
   def fixture(user_id) do
-    {:ok, white_list} = Accounts.create_white_list(@create_attrs |> Enum.into(%{user_id: user_id}))
+    {:ok, white_list} =
+      Accounts.create_white_list(@create_attrs |> Enum.into(%{user_id: user_id}))
+
     white_list
   end
 
@@ -54,8 +55,13 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   describe "update white_list" do
     setup [:create_white_list]
 
-    test "renders white_list when data is valid", %{conn: conn, white_list: %WhiteList{id: id} = white_list} do
-      conn = put(conn, Routes.white_list_path(conn, :update, white_list), white_list: @update_attrs)
+    test "renders white_list when data is valid", %{
+      conn: conn,
+      white_list: %WhiteList{id: id} = white_list
+    } do
+      conn =
+        put(conn, Routes.white_list_path(conn, :update, white_list), white_list: @update_attrs)
+
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, Routes.white_list_path(conn, :show, id))
@@ -67,7 +73,9 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn, white_list: white_list} do
-      conn = put(conn, Routes.white_list_path(conn, :update, white_list), white_list: @invalid_attrs)
+      conn =
+        put(conn, Routes.white_list_path(conn, :update, white_list), white_list: @invalid_attrs)
+
       assert json_response(conn, 422)["errors"] != %{}
     end
   end

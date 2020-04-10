@@ -12,20 +12,24 @@ defmodule AttoLinkWeb.UserController do
 
   def create(conn, %{"user" => user_params, "payment" => %{payment_method: pm_id, plan: plan_id}}) do
     with {:ok, %User{email: email} = user} <- Accounts.create_user(user_params),
-        {:ok, %Stripe.Customer{id: id} = customer} <- Stripe.Customer.create(%{email: email}),
-        {:ok, %User{}} <- Accounts.update_user(user, %{customer_id: id}),
-        {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(%{customer: customer, items: [%{plan: plan_id}], default_payment_method: pm_id}) do
+         {:ok, %Stripe.Customer{id: id} = customer} <- Stripe.Customer.create(%{email: email}),
+         {:ok, %User{}} <- Accounts.update_user(user, %{customer_id: id}),
+         {:ok, %Stripe.Subscription{}} <-
+           Stripe.Subscription.create(%{
+             customer: customer,
+             items: [%{plan: plan_id}],
+             default_payment_method: pm_id
+           }) do
       conn
       |> put_status(:created)
       |> verify_user(user)
-        else
-          {:error, %Stripe.Error{code: code, message: message}} ->
-            conn
-            |> send_resp(code, Poison.encode!(%{message: message}))
-
-
+    else
+      {:error, %Stripe.Error{code: code, message: message}} ->
+        conn
+        |> send_resp(code, Poison.encode!(%{message: message}))
     end
   end
+
   def create(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
@@ -68,7 +72,6 @@ defmodule AttoLinkWeb.UserController do
     with {:ok, _reply} <- Accounts.authenticate_user(user),
          conn <- AttoLink.Auth.Guardian.Plug.sign_in(conn, user),
          {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id}),
-
          token <- AttoLink.Auth.Guardian.Plug.current_token(conn) do
       conn
       |> put_status(:created)

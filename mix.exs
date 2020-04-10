@@ -23,7 +23,7 @@ defmodule AttoLink.MixProject do
       staging: [
         include_executables_for: [:unix],
         applications: [runtime_tools: :permanent],
-        path: "/home/deploy/phx/atto_link/releases",
+        path: "/home/deploy/phx/atto_link/releases"
       ]
     ]
   end
@@ -64,8 +64,9 @@ defmodule AttoLink.MixProject do
       {:edeliver, ">= 1.6.0"},
       {:distillery, "~> 2.0", warn_missing: false},
       {:recase, "~> 0.5"},
-      {:stripity_stripe, git: "https://github.com/PabloG6/stripity_stripe", ref: "efe9e221dffb104e2deb5dbd2d1e435a069b02e5"},
-
+      {:stripity_stripe,
+       git: "https://github.com/PabloG6/stripity_stripe",
+       ref: "efe9e221dffb104e2deb5dbd2d1e435a069b02e5"},
       {:todo, " >= 1.0.0", only: [:dev, :test]}
     ]
   end

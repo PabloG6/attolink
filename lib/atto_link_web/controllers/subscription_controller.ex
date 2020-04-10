@@ -1,7 +1,6 @@
 defmodule AttoLinkWeb.SubscriptionController do
   use AttoLinkWeb, :controller
 
-
   action_fallback AttoLinkWeb.FallbackController
 
   def index(_conn, _params) do
@@ -10,7 +9,6 @@ defmodule AttoLinkWeb.SubscriptionController do
   end
 
   def create(_conn, %{"subscriptions" => _subscriptions_params}) do
-
   end
 
   def show(_conn, %{"id" => _id}) do

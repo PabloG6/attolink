@@ -11,8 +11,10 @@ defmodule AttoLinkWeb.SubscriptionsView do
   end
 
   def render("subscriptions.json", %{subscriptions: subscriptions}) do
-    %{id: subscriptions.id,
+    %{
+      id: subscriptions.id,
       customer_id: subscriptions.customer_id,
-      subscription_type: subscriptions.subscription_type}
+      subscription_type: subscriptions.subscription_type
+    }
   end
 end

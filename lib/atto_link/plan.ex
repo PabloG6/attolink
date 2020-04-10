@@ -1,15 +1,36 @@
 defmodule AttoLink.Atto.Plan do
+  defstruct preview_limit: nil,
+            storage_limit: nil,
+            request_limit: nil,
+            request_overage: nil,
+            price: nil
 
-  defstruct preview_limit: nil, storage_limit: nil, request_limit: nil, request_overage: nil, price: nil
-  @type t() :: %AttoLink.Atto.Plan{preview_limit: integer, storage_limit: integer, request_limit: integer, request_overage: float, price: float}
+  @type t() :: %AttoLink.Atto.Plan{
+          preview_limit: integer,
+          storage_limit: integer,
+          request_limit: integer,
+          request_overage: float,
+          price: float
+        }
 
   def plan_type(:free) do
-    %AttoLink.Atto.Plan{preview_limit: 100, storage_limit: 104_857_600, request_limit: 500, request_overage: :none, price: 0}
+    %AttoLink.Atto.Plan{
+      preview_limit: 100,
+      storage_limit: 104_857_600,
+      request_limit: 500,
+      request_overage: :none,
+      price: 0
+    }
   end
 
   def plan_type(:basic) do
-    %AttoLink.Atto.Plan{preview_limit: 4000, storage_limit: 1_073_741_824, request_limit: 4000, request_overage: 0.06, price: 10.00}
-
+    %AttoLink.Atto.Plan{
+      preview_limit: 4000,
+      storage_limit: 1_073_741_824,
+      request_limit: 4000,
+      request_overage: 0.06,
+      price: 10.00
+    }
   end
 
   @doc """
@@ -19,9 +40,12 @@ defmodule AttoLink.Atto.Plan do
 
   """
   def plan_type(:premium) do
-    %AttoLink.Atto.Plan{preview_limit: 25000, storage_limit: 16_106_127_360, request_limit:  20000, request_overage: 0.04, price: 25}
+    %AttoLink.Atto.Plan{
+      preview_limit: 25000,
+      storage_limit: 16_106_127_360,
+      request_limit: 20000,
+      request_overage: 0.04,
+      price: 25
+    }
   end
-
-
-
 end
