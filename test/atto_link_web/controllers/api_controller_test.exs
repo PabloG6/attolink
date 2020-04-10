@@ -1,6 +1,5 @@
 defmodule AttoLinkWeb.ApiControllerTest do
   use AttoLinkWeb.ConnCase
-  use TODO
   alias AttoLink.Accounts
 
   def fixture(%Accounts.User{id: id}) do

@@ -1,6 +1,5 @@
 defmodule AttoLinkWeb.Router do
   use AttoLinkWeb, :router
-  use TODO
 
   pipeline :api do
     plug :accepts, ["json"]

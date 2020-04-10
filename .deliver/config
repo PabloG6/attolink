@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP="atto_link"
-BUILD_HOST="api.teenielink.dev"
+BUILD_HOST="68.183.100.121"
 BUILD_USER="deploy"
 BUILD_AT="/tmp/edeliver/$APP/builds/"
 
@@ -9,12 +9,11 @@ START_DEPLOY=true
 CLEAN_DEPLOY=true
 
 
-PRODUCTION_HOSTS="api.teenielink.dev"
+PRODUCTION_HOSTS="68.183.100.121"
 PRODUCTION_USER="deploy"
 DELIVER_TO="home/deploy/phx/apps/"
 AUTO_VERSION=revision
 
-PRODUCTION_HOSTS="api.teenielink.dev"
 
 pre_erlang_get_and_update_deps() {
   local _prod_secret_path="/home/deploy/app_config/prod.secret.exs"

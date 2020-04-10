@@ -1,6 +1,5 @@
 defmodule AttoLinkWeb.PreviewController do
   use AttoLinkWeb, :controller
-  use TODO
   alias AttoLink.Atto
   alias AttoLink.Atto.Preview
   action_fallback AttoLinkWeb.FallbackController

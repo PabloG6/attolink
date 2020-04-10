@@ -2,7 +2,6 @@ defmodule AttoLink.Atto do
   @moduledoc """
   The Atto context.
   """
-  use TODO
   import Ecto.Query, warn: false
   import Recase, only: [to_snake: 1]
   alias AttoLink.Repo
