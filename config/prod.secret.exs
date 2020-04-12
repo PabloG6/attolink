@@ -12,29 +12,19 @@ database_url =
     """
 
 stripe_test_key =
-  System.get_env("STRIPE_SECRET_KEY") ||
-    raise """
-    environment variable STRIPE_SECRET_KEY is missing.
-
-    """
+  "sk_test_VjpBvPBlY27yLOXU8r5lZEKi005iVURh37"
 
 username =
   System.get_env("DB_USERNAME") ||
-    raise """
-    environment variable DB_USERNAME is  missing
-    """
+    "deploy"
 
 password =
   System.get_env("DB_PASSWORD") ||
-    raise """
-    environment variable DB_PASSWORD is missing
-    """
+    "deploy"
 
 database =
   System.get_env("DB_NAME") ||
-    raise """
-    environment variable DB_NAME is missing
-    """
+    "deploy"
 
 hostname = "localhost"
 
@@ -46,19 +36,6 @@ config :atto_link, AttoLink.Repo,
   hostname: hostname,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15")
 
-secret_key_base =
-  System.get_env("SECRET_KEY_BASE") ||
-    raise """
-    environment variable SECRET_KEY_BASE is missing.
-    You can generate one by calling: mix phx.gen.secret
-    """
-
-config :atto_link, AttoLinkWeb.Endpoint,
-  http: [
-    port: String.to_integer(System.get_env("PORT") || "4000"),
-    transport_options: [socket_opts: [:inet6]]
-  ],
-  secret_key_base: secret_key_base
 
 config :stripity_stripe, api_key: stripe_test_key
 

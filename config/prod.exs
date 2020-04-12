@@ -23,6 +23,7 @@ config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "api.teenielink.dev", port: 3200],
   https: [
     port: 2001,
+    cacertfile: System.get_env("CA_CERT_FILE"),
     cipher_suite: :strong,
     keyfile: System.get_env("SSL_KEY_FILE"),
     certfile: System.get_env("SSL_CERT_FILE"),
