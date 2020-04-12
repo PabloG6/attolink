@@ -22,10 +22,10 @@ config :logger, level: :info
 config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "api.teenielink.dev", port: 3200],
   https: [
-    port: 3200,
+    port: 2001,
     cipher_suite: :strong,
-    keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
-    certfile: System.get_env("SOME_APP_SSL_CERT_PATH"),
+    keyfile: System.get_env("SSL_KEY_FILE"),
+    certfile: System.get_env("SSL_CERT_FILE"),
     transport_options: [socket_opts: [:inet6]]
   ]
 #
