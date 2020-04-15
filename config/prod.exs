@@ -20,15 +20,11 @@ config :logger, level: :info
 # to the previous section and set your `:url` port to 443:
 #
 config :atto_link, AttoLinkWeb.Endpoint,
-  url: [host: "api.teenielink.dev", port: 3200],
-  https: [
-    port: 2001,
-    cacertfile: System.get_env("CA_CERT_FILE"),
-    cipher_suite: :strong,
-    keyfile: System.get_env("SSL_KEY_FILE"),
-    certfile: System.get_env("SSL_CERT_FILE"),
-    transport_options: [socket_opts: [:inet6]]
-  ]
+	url: [host: "api.teenielink.dev"],
+	http: [ip: {127, 0, 0, 1}, port: 4000]
+	
+  
+  
 #
 # The `cipher_suite` is set to `:strong` to support only the
 # latest and more secure SSL ciphers. This means old browsers
