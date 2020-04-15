@@ -21,10 +21,10 @@ config :logger, level: :info
 #
 config :atto_link, AttoLinkWeb.Endpoint,
 	url: [host: "api.teenielink.dev"],
-	http: [ip: {127, 0, 0, 1}, port: 4000]
-	
-  
-  
+	http: [ip: {127, 0, 0, 1}, port: {:system, "PORT"} || 4000]
+
+
+
 #
 # The `cipher_suite` is set to `:strong` to support only the
 # latest and more secure SSL ciphers. This means old browsers
