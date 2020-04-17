@@ -21,6 +21,7 @@ config :logger, level: :info
 #
 config :atto_link, AttoLinkWeb.Endpoint,
 	url: [host: "staging.teenielink.dev"],
+
 	http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
   secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE"),
   config :atto_link, AttoLinkWeb.Endpoint,
