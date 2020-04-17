@@ -4,27 +4,27 @@
 # remember to add this file to your .gitignore.
 use Mix.Config
 
-database_url =
-  System.get_env("DATABASE_URL") ||
-    raise """
-    environment variable DATABASE_URL is missing.
-    For example: ecto://USER:PASS@HOST/DATABASE
-    """
+
 
 stripe_test_key =
   "sk_test_VjpBvPBlY27yLOXU8r5lZEKi005iVURh37"
 
 username =
   System.get_env("DB_USERNAME") ||
-    "deploy"
-
+  raise """
+  DB_USERNAME does not exist.
+  """
 password =
   System.get_env("DB_PASSWORD") ||
-    "deploy"
+  raise """
+    DB_PASSWORD does not exist as system environment variable
+  """
 
 database =
   System.get_env("DB_NAME") ||
-    "deploy"
+  raise """
+    DB_NAME does not exist as a system environment variable
+  """
 
 hostname = "localhost"
 

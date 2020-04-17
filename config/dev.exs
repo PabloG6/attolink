@@ -16,7 +16,7 @@ config :atto_link, AttoLink.Repo,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :atto_link, AttoLinkWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: {:system, "PORT"} || 6000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
