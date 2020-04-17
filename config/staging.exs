@@ -21,9 +21,10 @@ config :logger, level: :info
 #
 config :atto_link, AttoLinkWeb.Endpoint,
 	url: [host: "staging.teenielink.dev"],
+	server: true,
 	http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
-  secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE"),
-  config :atto_link, AttoLinkWeb.Endpoint,
+    secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
+ 
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.

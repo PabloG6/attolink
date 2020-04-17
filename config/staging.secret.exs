@@ -7,7 +7,7 @@ use Mix.Config
 
 
 stripe_test_key =
-  Systen.get_env("STRIPE_TEST_KEY") ||
+  System.get_env("STRIPE_TEST_KEY") ||
   raise """
   STRIPE_TEST_KEY does not exist as system environment variable.
   """
@@ -18,13 +18,13 @@ username =
   DB_USERNAME does not exist.
   """
 password =
-  System.get_env("STAGIN_DB_PASSWORD") ||
+  System.get_env("STAGING_DB_PASSWORD") ||
   raise """
-    DB_PASSWORD does not exist as system environment variable
+   STAGING_DB_PASSWORD does not exist as system environment variable
   """
 
 database =
-  System.get_env("STAGIN_DB_NAME") ||
+  System.get_env("STAGING_DB_NAME") ||
   raise """
     DB_NAME does not exist as a system environment variable
   """
