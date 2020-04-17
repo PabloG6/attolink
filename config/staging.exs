@@ -20,17 +20,17 @@ config :logger, level: :info
 # to the previous section and set your `:url` port to 443:
 #
 config :atto_link, AttoLinkWeb.Endpoint,
-	url: [host: "api.teenielink.dev"],
-	http: [ip: {127, 0, 0, 1}, port: {:system, "PORT"} || 4000]
-
-    config :atto_link, AttoLinkWeb.Endpoint,
+	url: [host: "staging.teenielink.dev"],
+	http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000]
+  secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
+  config :atto_link, AttoLinkWeb.Endpoint,
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
-import_config "prod.secret.exs"
+import_config "staging.secret.exs"
 
 
 #

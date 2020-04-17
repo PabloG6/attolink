@@ -7,24 +7,24 @@ use Mix.Config
 
 
 stripe_test_key =
-  Systen.get_env("STRIPE_PROD_KEY") ||
+  Systen.get_env("STRIPE_TEST_KEY") ||
   raise """
-  STRIPE_PROD_KEY does not exist as system environment variable.
+  STRIPE_TEST_KEY does not exist as system environment variable.
   """
 
 username =
-  System.get_env("DB_USERNAME") ||
+  System.get_env("STAGING_DB_USERNAME") ||
   raise """
   DB_USERNAME does not exist.
   """
 password =
-  System.get_env("DB_PASSWORD") ||
+  System.get_env("STAGIN_DB_PASSWORD") ||
   raise """
     DB_PASSWORD does not exist as system environment variable
   """
 
 database =
-  System.get_env("DB_NAME") ||
+  System.get_env("STAGIN_DB_NAME") ||
   raise """
     DB_NAME does not exist as a system environment variable
   """
@@ -32,7 +32,7 @@ database =
 hostname = "localhost"
 
 config :atto_link, AttoLink.Repo,
-  # ssl: true,
+
   username: username,
   password: password,
   database: database,
