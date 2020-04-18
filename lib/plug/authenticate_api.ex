@@ -54,7 +54,9 @@ defmodule AttoLink.Auth.Api do
   end
 
   defp fetch_key(%Plug.Conn{} = conn) do
-    case get_req_header(conn, "api_key") do
+ 	IO.inspect conn
+
+ 	case get_req_header(conn, "api_key") do
       [key | _tail] ->
         key
 
