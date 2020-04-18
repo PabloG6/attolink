@@ -19,7 +19,7 @@ defmodule AttoLink.Auth.Api do
       nil ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "unauthenticated"}))
+        |> resp(401, Poison.encode!(%{message: "This api key seems to be unregistered", response_code: :unregistered_api_key}))
         |> halt()
 
       {:error, :no_user} ->
@@ -54,6 +54,9 @@ defmodule AttoLink.Auth.Api do
   end
 
   defp fetch_key(%Plug.Conn{} = conn) do
+    IO.inspect conn
+    IO.puts "Hello World"
+    IO.inspect conn.req_headers
     case get_req_header(conn, "api_key") do
       [key | _tail] ->
         key
