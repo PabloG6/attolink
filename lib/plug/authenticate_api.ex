@@ -19,7 +19,7 @@ defmodule AttoLink.Auth.Api do
       nil ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "This api key seems to be unregistered", response_code: :unregistered_api_key}))
+        |> resp(401, Poison.encode!(%{message: "This api key does not coincide with a registered user.", response_code: :unregistered_api_key}))
         |> halt()
 
       {:error, :no_user} ->
@@ -28,12 +28,17 @@ defmodule AttoLink.Auth.Api do
         |> resp(
           401,
           Poison.encode!(%{
-            message: "You either have no api key or this is an unregistered api key",
+            message: "This api key does not coincide with a registered user.",
             response_code: :unregistered_api_key
           })
         )
         |> send_resp()
         |> halt()
+
+      {:error, :no_key} ->
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> resp(401, Poison.encode!(%{message: "No api key was sent with this request. ", response_code :missing_api_key}))
     end
   end
 
@@ -48,16 +53,14 @@ defmodule AttoLink.Auth.Api do
   defp verify_user({:no_key, %Plug.Conn{} = conn}) do
     conn
     |> put_resp_header("content-type", "application/json")
-    |> resp(401, Poison.encode!(%{message: "api key is missing"}))
+    |> resp(401, Poison.encode!(%{message: "This request has no api key contained in the request header. ", response_code: :missing_api_key}))
     |> send_resp()
     |> halt()
   end
 
   defp fetch_key(%Plug.Conn{} = conn) do
-    IO.inspect conn
-    IO.puts "Hello World"
-    IO.inspect conn.req_headers
-    case get_req_header(conn, "api_key") do
+
+    case get_req_header(conn, "apikey") do
       [key | _tail] ->
         key
 
@@ -66,7 +69,7 @@ defmodule AttoLink.Auth.Api do
     end
   end
 
-  @spec current_user(conn :: Plug.Conn.t()) :: {:error, :no_user} | {:ok, any}
+  @spec current_user(conn :: Plug.Conn.t()) :: {:error, :no_user} | {:ok, any} | {:error, :no_key}
   def current_user(conn) do
     key = fetch_key(conn)
     Accounts.get_user_by_api_key(key)

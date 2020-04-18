@@ -20,7 +20,7 @@ username =
 password =
   System.get_env("STAGING_DB_PASSWORD") ||
   raise """
-    DB_PASSWORD does not exist as system environment variable
+   STAGING_DB_PASSWORD does not exist as system environment variable
   """
 
 database =

@@ -215,10 +215,11 @@ defmodule AttoLink.Accounts do
   """
 
   def get_user_by_api_key(nil) do
-    {:error, :no_user}
+	IO.puts "API KEY IS NULL"
+	{:error, :no_key}
   end
 
-  @spec get_user_by_api_key(api_key :: String.t() | nil) :: {:ok, %User{}} | {:error, :no_user}
+  @spec get_user_by_api_key(api_key :: String.t() | nil) :: {:ok, %User{}} | {:error, :no_user} | {:error, :no_key}
   def get_user_by_api_key(api_key) do
     with %Api{} = api <-
            Repo.get_by(Api, api_key: api_key)
