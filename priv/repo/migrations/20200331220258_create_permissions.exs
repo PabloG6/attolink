@@ -7,6 +7,7 @@ defmodule AttoLink.Repo.Migrations.CreatePermissions do
     create table(:permissions) do
       add :enable_whitelist, WhiteListPermissions.type(), default: "all"
       add :user_id, references(:user, type: :uuid, on_delete: :nothing)
+      timestamps()
     end
 
     unique_index(:permissions, :user_id)
