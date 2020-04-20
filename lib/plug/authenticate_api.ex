@@ -38,7 +38,9 @@ defmodule AttoLink.Auth.Api do
       {:error, :no_key} ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "No api key was sent with this request. ", response_code :missing_api_key}))
+        |> resp(401, Poison.encode!(%{message: "No api key was sent with this request. ", response_code: :missing_api_key}))
+        |> send_resp()
+        |> halt()
     end
   end
 

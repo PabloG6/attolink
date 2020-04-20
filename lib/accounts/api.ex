@@ -15,7 +15,7 @@ defmodule AttoLink.Accounts.Api do
     |> cast(attrs, [:user_id])
     |> generate_api_key
     |> validate_required([:user_id, :api_key])
-    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:user_id, name: :api_key_user_id_fkey)
     |> unique_constraint(:api_key)
   end
 

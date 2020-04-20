@@ -6,8 +6,8 @@ defmodule AttoLinkWeb.UserController do
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do
-    user = Accounts.list_user()
-    render(conn, "index.json", user: user)
+    user = Guardian.Plug.current_resource(conn)
+    render(conn, "show.json", user: user)
   end
 
   def create(conn, %{"user" => user_params, "payment" => %{payment_method: pm_id, plan: plan_id}}) do
@@ -59,11 +59,21 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
+  def delete(conn, _params) do
+    IO.inspect conn
+    user = Guardian.Plug.current_resource(conn)
+    IO.inspect user
 
-    with {:ok, %User{}} <- Accounts.delete_user(user) do
+    with %User{} = user <- Guardian.Plug.current_resource(conn),
+        {:ok, %User{}} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
+        else
+          nil ->
+            conn
+            |> resp(404, Poison.encode!(%{message: "This user does not exist or has already been deleted", response_code: :does_not_exist}))
+            |> send_resp()
+            |> halt()
+
     end
   end
 

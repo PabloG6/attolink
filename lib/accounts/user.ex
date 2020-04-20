@@ -19,6 +19,7 @@ defmodule AttoLink.Accounts.User do
     field :password, :string, virtual: true
     field :plan, Plan, default: :free
     field :customer_id, :string
+
     has_many :api_keys, Accounts.Api
     has_many :previews, AttoLink.Accounts.User
     timestamps()
