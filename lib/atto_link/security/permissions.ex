@@ -13,6 +13,7 @@ defmodule AttoLink.Security.Permissions do
   schema "permissions" do
     field :enable_whitelist, WhiteListPermissions, default: :all
     belongs_to :user, AttoLink.Accounts.User, type: :binary_id
+    timestamps()
   end
 
   @doc false
