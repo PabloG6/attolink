@@ -28,7 +28,7 @@ defmodule AttoLinkWeb.UserControllerTest do
 
     test "lists all user", %{conn: conn, user: user} do
       conn = get(conn, Routes.user_path(conn, :index))
-      assert json_response(conn, 200)["data"] == [%{"email" => user.email, "id" => user.id}]
+      assert json_response(conn, 200)["data"] == %{"email" => user.email, "id" => user.id}
     end
   end
 
@@ -76,7 +76,7 @@ defmodule AttoLinkWeb.UserControllerTest do
     setup [:create_user, :sign_in_user]
 
     test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete(conn, Routes.user_path(conn, :delete, user))
+      conn = delete(conn, Routes.user_path(conn, :delete))
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->

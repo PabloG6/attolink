@@ -13,7 +13,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
     setup [:authenticate_user, :authenticate_api]
 
     test "renders preview when data is valid", %{conn: conn, key: key} do
-      conn = put_req_header(conn, "api_key", key.api_key)
+      conn = put_req_header(conn, "apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url)
 
       assert %{
@@ -28,7 +28,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
     @tag :preview
 
     test "caches web page and renders preview when data is valid", %{conn: conn, key: key} do
-      conn = put_req_header(conn, "api_key", key.api_key)
+      conn = put_req_header(conn, "apikey", key.api_key)
 
       conn = get(conn, Routes.preview_path(conn, :create), url: @valid_url, cacheUrl: "true")
 
@@ -49,8 +49,8 @@ defmodule AttoLinkWeb.PreviewControllerTest do
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
       assert json_response(conn, 401) == %{
-               "message" => "You either have no api key or this is an unregistered api key",
-               "response_code" => "unregistered_api_key"
+               "message" => "No api key was sent with this request.NO",
+               "response_code" => "missing_api_key"
              }
     end
   end
@@ -60,16 +60,16 @@ defmodule AttoLinkWeb.PreviewControllerTest do
 
     test "renders error when user is not logged in", %{conn: conn, key: key} do
       # call this connection four times.
-      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
-      conn = recycle(conn) |> put_req_header("api_key", key.api_key)
+      conn = recycle(conn) |> put_req_header("apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
       assert json_response(conn, 200)
