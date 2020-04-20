@@ -19,7 +19,13 @@ defmodule AttoLink.Auth.Api do
       nil ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "This api key does not coincide with a registered user.", response_code: :unregistered_api_key}))
+        |> resp(
+          401,
+          Poison.encode!(%{
+            message: "This api key does not coincide with a registered user.",
+            response_code: :unregistered_api_key
+          })
+        )
         |> halt()
 
       {:error, :no_user} ->
@@ -38,7 +44,13 @@ defmodule AttoLink.Auth.Api do
       {:error, :no_key} ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{message: "No api key was sent with this request.", response_code: :missing_api_key}))
+        |> resp(
+          401,
+          Poison.encode!(%{
+            message: "No api key was sent with this request.",
+            response_code: :missing_api_key
+          })
+        )
         |> send_resp()
         |> halt()
     end
@@ -55,13 +67,18 @@ defmodule AttoLink.Auth.Api do
   defp verify_user({:no_key, %Plug.Conn{} = conn}) do
     conn
     |> put_resp_header("content-type", "application/json")
-    |> resp(401, Poison.encode!(%{message: "This request has no api key contained in the request header. ", response_code: :missing_api_key}))
+    |> resp(
+      401,
+      Poison.encode!(%{
+        message: "This request has no api key contained in the request header. ",
+        response_code: :missing_api_key
+      })
+    )
     |> send_resp()
     |> halt()
   end
 
   defp fetch_key(%Plug.Conn{} = conn) do
-
     case get_req_header(conn, "apikey") do
       [key | _tail] ->
         key

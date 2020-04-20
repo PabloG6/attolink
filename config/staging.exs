@@ -24,14 +24,8 @@ config :atto_link, AttoLinkWeb.Endpoint,
 
 	server: true,
 	http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
-<<<<<<< HEAD
   secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
 
-=======
-    secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
- 
-  #       force_ssl: [hsts: true]
->>>>>>> f48c2a0e0b599cb577497c9c962b9fb8695a5215
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 

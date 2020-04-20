@@ -9,6 +9,7 @@ defmodule AttoLinkWeb.SubscriptionController do
   end
 
   def create(_conn, %{"subscriptions" => _subscriptions_params}) do
+    # create a new payment.
   end
 
   def show(_conn, %{"id" => _id}) do

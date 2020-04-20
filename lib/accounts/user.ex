@@ -22,6 +22,7 @@ defmodule AttoLink.Accounts.User do
 
     has_many :api_keys, Accounts.Api
     has_many :previews, AttoLink.Accounts.User
+    has_one  :permissions, AttoLink.Security.Permissions
     timestamps()
   end
 

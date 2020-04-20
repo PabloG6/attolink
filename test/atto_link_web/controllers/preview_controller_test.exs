@@ -49,7 +49,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
       assert json_response(conn, 401) == %{
-               "message" => "No api key was sent with this request.NO",
+               "message" => "No api key was sent with this request.",
                "response_code" => "missing_api_key"
              }
     end
