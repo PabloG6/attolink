@@ -60,9 +60,7 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def delete(conn, _params) do
-    IO.inspect conn
     user = Guardian.Plug.current_resource(conn)
-    IO.inspect user
 
     with %User{} = user <- Guardian.Plug.current_resource(conn),
         {:ok, %User{}} <- Accounts.delete_user(user) do

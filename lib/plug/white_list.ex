@@ -64,12 +64,21 @@ defmodule AttoLink.Plug.WhiteList do
         |> resp(
           401,
           Poison.encode!(%{
-            message: "You either have no api key or this is an unregistered api key",
+            message: "This api key does not coincide with a registered user.",
             response_code: :unregistered_api_key
           })
         )
         |> send_resp()
         |> halt()
+
+      {:error, :no_key} ->
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> resp(401, Poison.encode!(%{
+          message: "This request has no api key",
+          response_code: :missing_api_key
+        }))
+
     end
   end
 end
