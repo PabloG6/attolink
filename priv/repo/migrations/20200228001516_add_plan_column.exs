@@ -10,6 +10,9 @@ defmodule AttoLink.Repo.Migrations.AddPlanColumn do
   end
 
   def down do
+    alter table(:user) do
+      remove :plan
+    end
     Plan.drop_type()
   end
 end

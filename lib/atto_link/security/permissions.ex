@@ -13,7 +13,6 @@ defmodule AttoLink.Security.Permissions do
   schema "permissions" do
     field :enable_whitelist, WhiteListPermissions, default: :all
     belongs_to :user, AttoLink.Accounts.User, type: :binary_id
-    timestamps()
   end
 
   @doc false
@@ -21,7 +20,7 @@ defmodule AttoLink.Security.Permissions do
     permissions
     |> cast(attrs, [:enable_whitelist, :user_id])
     |> validate_required([:user_id])
-    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:user_id, name: :permissions_user_id_fkey)
     |> unique_constraint(:user_id)
   end
 end
