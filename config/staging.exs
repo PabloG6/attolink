@@ -10,7 +10,6 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 
-
 # Do not print debug messages in production
 config :logger, level: :info
 
@@ -20,25 +19,17 @@ config :logger, level: :info
 # to the previous section and set your `:url` port to 443:
 #
 config :atto_link, AttoLinkWeb.Endpoint,
-	url: [host: "staging.teenielink.dev"],
-
-	server: true,
-	http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
-<<<<<<< HEAD
+  url: [host: "staging.teenielink.dev"],
+  server: true,
+  http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
   secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
 
-=======
-    secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
- 
-  #       force_ssl: [hsts: true]
->>>>>>> f48c2a0e0b599cb577497c9c962b9fb8695a5215
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
 import_config "staging.secret.exs"
-
 
 #
 # The `cipher_suite` is set to `:strong` to support only the

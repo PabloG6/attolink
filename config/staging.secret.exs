@@ -4,41 +4,38 @@
 # remember to add this file to your .gitignore.
 use Mix.Config
 
-
-
 stripe_test_key =
   System.get_env("STRIPE_TEST_KEY") ||
-  raise """
-  STRIPE_TEST_KEY does not exist as system environment variable.
-  """
+    raise """
+    STRIPE_TEST_KEY does not exist as system environment variable.
+    """
 
 username =
   System.get_env("STAGING_DB_USERNAME") ||
-  raise """
-  DB_USERNAME does not exist.
-  """
+    raise """
+    DB_USERNAME does not exist.
+    """
+
 password =
   System.get_env("STAGING_DB_PASSWORD") ||
-  raise """
-   STAGING_DB_PASSWORD does not exist as system environment variable
-  """
+    raise """
+     STAGING_DB_PASSWORD does not exist as system environment variable
+    """
 
 database =
   System.get_env("STAGING_DB_NAME") ||
-  raise """
-    DB_NAME does not exist as a system environment variable
-  """
+    raise """
+      DB_NAME does not exist as a system environment variable
+    """
 
 hostname = "localhost"
 
 config :atto_link, AttoLink.Repo,
-
   username: username,
   password: password,
   database: database,
   hostname: hostname,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15")
-
 
 config :stripity_stripe, api_key: stripe_test_key
 
