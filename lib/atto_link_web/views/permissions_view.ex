@@ -13,7 +13,7 @@ defmodule AttoLinkWeb.PermissionsView do
   def render("permissions.json", %{permissions: permissions}) do
     %{
       id: permissions.id,
-      enable_whitelist: permissions.enable_whitelis
+      enable_whitelist: permissions.enable_whitelist
     }
   end
 end

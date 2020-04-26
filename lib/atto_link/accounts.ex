@@ -86,6 +86,12 @@ defmodule AttoLink.Accounts do
     |> Repo.update()
   end
 
+  def update_user_plan(%User{} = user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a user.
 
@@ -215,10 +221,11 @@ defmodule AttoLink.Accounts do
   """
 
   def get_user_by_api_key(nil) do
-	{:error, :no_key}
+    {:error, :no_key}
   end
 
-  @spec get_user_by_api_key(api_key :: String.t() | nil) :: {:ok, %User{}} | {:error, :no_user} | {:error, :no_key}
+  @spec get_user_by_api_key(api_key :: String.t() | nil) ::
+          {:ok, %User{}} | {:error, :no_user} | {:error, :no_key}
   def get_user_by_api_key(api_key) do
     with %Api{} = api <-
            Repo.get_by(Api, api_key: api_key)
@@ -329,14 +336,11 @@ defmodule AttoLink.Accounts do
   @spec verify_white_list(ip :: String.t(), AttoLink.Accounts.User.t()) ::
           {:ok, AttoLink.Accounts.WhiteList.t()} | {:error, :unverified_ip}
   def verify_white_list(ip, %User{id: id}) do
-
     with true <- String.match?(ip, ~r/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?(\.|$)){4}/),
-
-               %WhiteList{} = white_list <- Repo.get_by(WhiteList, ip_address: ip, user_id: id) do
+         %WhiteList{} = white_list <- Repo.get_by(WhiteList, ip_address: ip, user_id: id) do
       {:ok, white_list}
     else
       nil -> {:error, :unverified_ip}
-
       false -> {:error, :unverified_ip}
     end
   end

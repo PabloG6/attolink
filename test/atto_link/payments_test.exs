@@ -2,28 +2,29 @@ defmodule AttoLink.PaymentsTest do
   use AttoLink.DataCase
 
   alias AttoLink.Payments
-
+  alias AttoLink.Accounts
   describe "subscription" do
     alias AttoLink.Payments.Subscription
 
     @valid_attrs %{
       canceled: true,
-      canceled_at: 42,
-      customer: "some customer",
+      customer_id: "some customer",
+      nickname: "Free",
       subscription_id: "some subscription_id"
     }
     @update_attrs %{
       canceled: false,
-      canceled_at: 43,
-      customer: "some updated customer",
+      customer_id: "some updated customer",
       subscription_id: "some updated subscription_id"
     }
     @invalid_attrs %{canceled: nil, canceled_at: nil, customer: nil, subscription_id: nil}
 
     def subscription_fixture(attrs \\ %{}) do
+      {:ok, user} = Accounts.create_user(%{email: "someemail@gmail.com", password: "password"})
       {:ok, subscription} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Enum.into(%{user_id: user.id})
         |> Payments.create_subscription()
 
       subscription
@@ -36,14 +37,15 @@ defmodule AttoLink.PaymentsTest do
 
     test "get_subscription!/1 returns the subscription with given id" do
       subscription = subscription_fixture()
+
       assert Payments.get_subscription!(subscription.id) == subscription
     end
 
     test "create_subscription/1 with valid data creates a subscription" do
-      assert {:ok, %Subscription{} = subscription} = Payments.create_subscription(@valid_attrs)
+      {:ok, %Accounts.User{id: id}} = Accounts.create_user(%{email: "grammy@email.com", password: "password"})
+      assert {:ok, %Subscription{} = subscription} = Payments.create_subscription(@valid_attrs |> Enum.into(%{user_id: id}))
       assert subscription.canceled == true
-      assert subscription.canceled_at == 42
-      assert subscription.customer == "some customer"
+      assert subscription.customer_id == "some customer"
       assert subscription.subscription_id == "some subscription_id"
     end
 
@@ -58,8 +60,7 @@ defmodule AttoLink.PaymentsTest do
                Payments.update_subscription(subscription, @update_attrs)
 
       assert subscription.canceled == false
-      assert subscription.canceled_at == 43
-      assert subscription.customer == "some updated customer"
+      assert subscription.customer_id == "some updated customer"
       assert subscription.subscription_id == "some updated subscription_id"
     end
 

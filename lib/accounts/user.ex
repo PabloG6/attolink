@@ -19,10 +19,10 @@ defmodule AttoLink.Accounts.User do
     field :password, :string, virtual: true
     field :plan, Plan, default: :free
     field :customer_id, :string
-
+    has_one :subscription, Payments.Subscription
     has_many :api_keys, Accounts.Api
     has_many :previews, AttoLink.Accounts.User
-    has_one  :permissions, AttoLink.Security.Permissions
+    has_one :permissions, AttoLink.Security.Permissions
     timestamps()
   end
 
@@ -33,6 +33,12 @@ defmodule AttoLink.Accounts.User do
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
     |> put_password_hash
+  end
+
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :password, :plan, :customer_id])
+    |> unique_constraint(:email)
   end
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: nil}} = changeset) do
