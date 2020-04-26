@@ -58,7 +58,7 @@ defmodule AttoLinkWeb.PreviewController do
 
   def create(conn, %{"url" => url, "cacheUrl" => "true", "async" => "true"} = params) do
     {:ok, user} = AttoLink.Auth.Api.current_user(params)
-    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user)
+    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.plan)
 
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),

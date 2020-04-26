@@ -4,7 +4,7 @@ defmodule AttoLink.Repo.Migrations.CreateSubscription do
   def change do
     create table(:subscription) do
       add :subscription_id, :string
-      add :customer, :string
+      add :customer_id, :string
       add :canceled, :boolean, default: false, null: false
       add :canceled_at, :integer
 

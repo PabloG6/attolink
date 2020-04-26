@@ -10,7 +10,7 @@ defmodule AttoLink.Repo.Migrations.CreatePermissions do
       timestamps()
     end
 
-    unique_index(:permissions, :user_id)
+    create unique_index(:permissions, :user_id)
   end
 
   def down do

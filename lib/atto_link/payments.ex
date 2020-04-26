@@ -49,7 +49,7 @@ defmodule AttoLink.Payments do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_subscription(attrs \\ {}) do
+  def create_subscription(attrs \\ %{}) do
     %Subscription{}
     |> Subscription.changeset(attrs)
     |> Repo.insert()
@@ -100,5 +100,9 @@ defmodule AttoLink.Payments do
   """
   def change_subscription(%Subscription{} = subscription) do
     Subscription.changeset(subscription, %{})
+  end
+
+  def get_subscriptions_by(info \\ []) do
+    Repo.get_by(Subscription, info)
   end
 end

@@ -74,11 +74,13 @@ defmodule AttoLink.Plug.WhiteList do
       {:error, :no_key} ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> resp(401, Poison.encode!(%{
-          message: "This request has no api key",
-          response_code: :missing_api_key
-        }))
-
+        |> resp(
+          401,
+          Poison.encode!(%{
+            message: "This request has no api key",
+            response_code: :missing_api_key
+          })
+        )
     end
   end
 end

@@ -31,10 +31,11 @@ defmodule AttoLinkWeb.Router do
     pipe_through [:api, :auth]
     resources "/user", UserController, except: [:new, :edit, :create, :delete]
     delete "/user", UserController, :delete
-    resources "/keys", ApiController, except: [:new, :edit]
+    resources "/keys", ApiController, except: [:new, :edit, :update]
     resources "/whitelist", WhiteListController, except: [:new, :edit]
-    resources "/subscriptions", SubscriptionController, except: [:new, :edit]
+    resources "/subscriptions", SubscriptionController, except: [:new, :edit, :update]
     resources "/account", PermissionsController, except: [:new, :edit]
+    put "/subscriptions", SubscriptionController, :update
   end
 
   scope "/v1", AttoLinkWeb do

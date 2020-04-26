@@ -2,33 +2,92 @@ defmodule AttoLinkWeb.SubscriptionController do
   use AttoLinkWeb, :controller
 
   action_fallback AttoLinkWeb.FallbackController
+  alias AttoLink.Accounts
+  alias AttoLink.Payments
 
   def index(_conn, _params) do
     # subscriptions = Payments.list_subscriptions()
     # render(conn, "index.json", subscriptions: subscriptions)
   end
 
-  def create(_conn, %{"subscriptions" => _subscriptions_params}) do
+  def create(conn, %{
+        "subscriptions" =>
+          %{"payment_method_id" => pm_id, "plan_id" => plan_id} = _subscriptions_params
+      }) do
+    with %Accounts.User{email: email} = user <-
+           AttoLink.Auth.Guardian.Plug.current_resource(conn),
+         {:ok, %Stripe.Customer{id: cus_id} = customer} <-
+           Stripe.Customer.create(%{
+             email: email,
+             payment_method: pm_id,
+             invoice_settings: %{custom_fields: nil, default_payment_method: pm_id, footer: nil}
+           }),
+         {:ok, %Stripe.Subscription{id: sub_id} = _subscription} <-
+           Stripe.Subscription.create(%{
+             customer: customer,
+             items: [%{plan: plan_id}]
+           }),
+         {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
+         {:ok, %Accounts.User{}} <-
+           Accounts.update_user_plan(user, %{
+             customer_id: cus_id,
+             plan: String.downcase(nickname) |> String.to_atom()
+           }),
+         {:ok, %Payments.Subscription{} = subscription} <-
+           Payments.create_subscription(%{
+             subscription_id: sub_id,
+             user_id: user.id,
+             nickname: nickname,
+             customer_id: cus_id
+           }) do
+      conn
+      |> put_status(:created)
+      |> put_view(AttoLinkWeb.SubscriptionsView)
+      |> render("show.json", subscriptions: subscription)
+    end
   end
 
-  def show(_conn, %{"id" => _id}) do
-    # subscriptions = Payments.get_subscriptions!(id)
-    # render(conn, "show.json", subscriptions: subscriptions)
+  def show(conn, _params) do
+    user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
+    subscriptions = Payments.get_subscriptions_by(user_id: user.id)
+    render(conn, "show.json", subscriptions: subscriptions)
   end
 
-  def update(_conn, %{"id" => _id, "subscriptions" => _subscriptions_params}) do
-    # subscriptions = Payments.get_subscriptions!(id)
+  def update(conn, %{"subscriptions" => %{"plan_id" => plan_id} = _subscriptions_params}) do
+    user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
 
-    # with {:ok, %Subscriptions{} = subscriptions} <- Payments.update_subscriptions(subscriptions, subscriptions_params) do
-    #   # render(conn, "show.json", subscriptions: subscriptions)
-    # end
+    with %Payments.Subscription{subscription_id: subscription_id} = payments <-
+           Payments.get_subscriptions_by(user_id: user.id),
+         {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: items_list}}} <-
+           Stripe.Subscription.retrieve(subscription_id),
+         item <- Enum.at(items_list, 0),
+         {:ok, %Stripe.Subscription{id: sub_id,items: %Stripe.List{data: [sub_item | _tail]}} = subscription} <- Stripe.Subscription.update(sub_id, %{
+                                                                                  cancel_at_period_end: false,
+                                                                                  items: [%{id: item.id, plan: plan_id}]
+                                                                                }),
+         {:ok, %Payments.Subscription{}} <- Payments.update_subscription(payments, %{subscription_id: sub_id, nickname: sub_item.plan.nickname,
+                                            plan_id: plan_id})
+          do
+
+                conn
+                |> put_status(:ok)
+                |> put_view(AttoLinkWeb.SubscriptionsView)
+                |> render("show.json", subscriptions: subscription)
+
+
+    end
   end
 
-  def delete(_conn, %{"id" => _id}) do
-    # subscriptions = Payments.get_subscriptions!(id)
+  @spec delete(Plug.Conn.t(), any) :: any
+  def delete(conn, _params) do
+    user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
+    subscriptions = Payments.get_subscriptions_by(user_id: user.id)
 
-    # with {:ok, %Subscriptions{}} <- Payments.delete_subscriptions(subscriptions) do
-    #   send_resp(conn, :no_content, "")
-    # end
+    with {:ok, %Stripe.Subscription{} = _stripe_sub} <-
+           Stripe.Subscription.update(subscriptions.subscription_id, %{cancel_at_period_end: true}),
+         {:ok, %Payments.Subscription{}} <-
+           Payments.update_subscription(subscriptions, %{canceled: true, nickname: "Free"}) do
+      send_resp(conn, :no_content, "")
+    end
   end
 end

@@ -5,7 +5,7 @@ defmodule AttoLinkWeb.PermissionsController do
   alias AttoLink.Security.Permissions
 
   action_fallback AttoLinkWeb.FallbackController
-
+  @permission_types ["all", "none", "restricted"]
   def index(conn, _params) do
     permissions = Security.list_permissions()
     render(conn, "index.json", permissions: permissions)
@@ -20,6 +20,21 @@ defmodule AttoLinkWeb.PermissionsController do
       |> put_status(:created)
       |> put_resp_header("location", Routes.permissions_path(conn, :show, permissions))
       |> render("show.json", permissions: permissions)
+    else
+      {:error, %Ecto.Changeset{errors: [user_id: _user_error]}} ->
+        conn
+        |> resp(
+          409,
+          Poison.encode!(%{
+            message: "This user already has permissions set",
+            response_code: :already_set_permissions
+          })
+        )
+        |> send_resp()
+        |> halt()
+
+      error ->
+        error
     end
   end
 
