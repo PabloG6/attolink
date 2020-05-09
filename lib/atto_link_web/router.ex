@@ -10,6 +10,7 @@ defmodule AttoLinkWeb.Router do
   end
 
   pipeline :auth do
+    plug :print_headers
     plug AttoLink.Auth.Pipeline
   end
 
@@ -35,11 +36,17 @@ defmodule AttoLinkWeb.Router do
     resources "/whitelist", WhiteListController, except: [:new, :edit]
     resources "/subscriptions", SubscriptionController, except: [:new, :edit, :update]
     resources "/account", PermissionsController, except: [:new, :edit]
+    get "/auth/check_token", UserController, :check_token
     put "/subscriptions", SubscriptionController, :update
   end
 
   scope "/v1", AttoLinkWeb do
     pipe_through [:api, :white_list, :api_auth]
     get "/preview", PreviewController, :create
+  end
+
+  defp print_headers(conn, _opts) do
+    # IO.inspect conn
+    conn
   end
 end

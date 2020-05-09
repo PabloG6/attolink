@@ -39,7 +39,20 @@ defmodule AttoLinkWeb.Endpoint do
     json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride
+
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  plug Corsica, origins: "*",
+                allow_headers: :all,
+                allow_credentials: true,
+                allow_methods: :all,
+                log: [rejected: :debug, accepted: :debug]
+  plug :print_headers
   plug AttoLinkWeb.Router
+
+  def print_headers(conn, _opt) do
+    IO.inspect conn
+    conn
+  end
 end

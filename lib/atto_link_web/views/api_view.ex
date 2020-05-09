@@ -11,6 +11,11 @@ defmodule AttoLinkWeb.ApiView do
   end
 
   def render("api.json", %{api: api}) do
-    %{api_key: api.api_key, id: api.id, user_id: api.user_id}
+    %{
+      api_key: api.api_key,
+      id: api.id, user_id:
+      api.user_id,
+      inserted_at: api.inserted_at
+    }
   end
 end

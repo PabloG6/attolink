@@ -5,7 +5,6 @@ defmodule AttoLinkWeb.PermissionsController do
   alias AttoLink.Security.Permissions
 
   action_fallback AttoLinkWeb.FallbackController
-  @permission_types ["all", "none", "restricted"]
   def index(conn, _params) do
     permissions = Security.list_permissions()
     render(conn, "index.json", permissions: permissions)
