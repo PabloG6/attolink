@@ -1,7 +1,6 @@
 defmodule AttoLinkWeb.SubscriptionControllerTest do
   use AttoLinkWeb.ConnCase
   alias AttoLink.Accounts
-  alias AttoLink.Payments
 
   defp fixture() do
     with {:ok, %Accounts.User{} = user} <-
@@ -32,7 +31,9 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       payment_method_id: payment_method_id,
       user: _user
     } do
-      {:ok, %Stripe.Plan{id: plan_id}} = Stripe.Plan.retrieve("plan_H8jujqCsCbL6DU")
+
+
+      {:ok, %Stripe.Plan{id: plan_id}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
 
       conn =
         post(
@@ -52,7 +53,7 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       conn: conn,
       payment_method_id: payment_method_id
     } do
-      {:ok, %Stripe.Plan{id: plan_id}} = plan = Stripe.Plan.retrieve("plan_H8jujqCsCbL6DU")
+      {:ok, %Stripe.Plan{id: plan_id}} = _plan = Stripe.Plan.retrieve("plan_HGceCYomvatDSw")
 
       conn =
         post(
@@ -64,7 +65,7 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
 
       assert json_response(conn, 201)
 
-      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_H0FUo1nDHArbLw")
+      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
 
       conn =
         put(
@@ -76,8 +77,8 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
     end
 
     test "downgrade subscription from enterprise plan to basic plan. " , %{conn: conn, payment_method_id: payment_method_id}do
-      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_H0FUo1nDHArbLw")
-      {:ok, %Stripe.Plan{id: basic_plan}} = Stripe.Plan.retrieve("plan_H8jujqCsCbL6DU")
+      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_HGceCYomvatDSw")
+      {:ok, %Stripe.Plan{id: basic_plan}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
 
       conn =
         post(

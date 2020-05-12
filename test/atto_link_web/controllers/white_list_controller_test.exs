@@ -5,10 +5,11 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   alias AttoLink.Accounts.WhiteList
 
   @create_attrs %{
-    ip_address: "some ip_address"
+    ip_address: "255.255.255.255"
   }
   @update_attrs %{
-    ip_address: "some updated ip_address"
+    ip_address: "https://example.com",
+    type: :url
   }
   @invalid_attrs %{ip_address: nil}
 
@@ -42,7 +43,7 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
 
       assert %{
                "id" => id,
-               "ip_address" => "some ip_address"
+               "ip_address" => "255.255.255.255"
              } = json_response(conn, 200)["data"]
     end
 
@@ -68,7 +69,7 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
 
       assert %{
                "id" => id,
-               "ip_address" => "some updated ip_address"
+               "ip_address" => "https://example.com"
              } = json_response(conn, 200)["data"]
     end
 

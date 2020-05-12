@@ -10,7 +10,6 @@ defmodule AttoLinkWeb.Router do
   end
 
   pipeline :auth do
-    plug :print_headers
     plug AttoLink.Auth.Pipeline
   end
 
@@ -45,8 +44,5 @@ defmodule AttoLinkWeb.Router do
     get "/preview", PreviewController, :create
   end
 
-  defp print_headers(conn, _opts) do
-    # IO.inspect conn
-    conn
-  end
+
 end

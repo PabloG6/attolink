@@ -31,7 +31,6 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    IO.inspect conn
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
       conn
       |> put_status(:created)
@@ -40,10 +39,17 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def login(conn, %{"user" => %{"email" => email, "password" => password}} = _params) do
-    with user <- Accounts.get_by(email: email) do
+    with %User{} = user <- Accounts.get_by(email: email) do
       conn
       |> put_status(:ok)
       |> verify_user(%{user | password: password})
+    else
+      nil ->
+        conn
+        |> put_status(:unauthorized)
+        |> put_view(AttoLinkWeb.ErrorView)
+        |> render(:login)
+
     end
   end
 
@@ -96,7 +102,6 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def check_token(conn, _params) do
-        IO.puts "hello inside check_token"
         with %User{} <- Guardian.Plug.current_resource(conn) do
           conn
           |> resp(200, Poison.encode!(%{message: :token_valid}))

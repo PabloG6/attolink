@@ -48,11 +48,7 @@ defmodule AttoLinkWeb.Endpoint do
                 allow_credentials: true,
                 allow_methods: :all,
                 log: [rejected: :debug, accepted: :debug]
-  plug :print_headers
   plug AttoLinkWeb.Router
 
-  def print_headers(conn, _opt) do
-    IO.inspect conn
-    conn
-  end
+
 end

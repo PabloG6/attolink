@@ -143,13 +143,15 @@ defmodule AttoLink.Accounts do
       [%Api{}, ...]
 
   """
-  def list_api_key do
-    Repo.all(Api)
+  def list_api_key(user) do
+    query = from u in Api,
+            where: u.user_id == ^user.id
+
+    Repo.all(query)
   end
 
   @doc """
   Gets a single api.
-
   Raises `Ecto.NoResultsError` if the Api does not exist.
 
   ## Examples
@@ -248,8 +250,10 @@ defmodule AttoLink.Accounts do
       [%WhiteList{}, ...]
 
   """
-  def list_whitelist do
-    Repo.all(WhiteList)
+  def list_whitelist(user) do
+    query = from w in WhiteList,
+            where: w.user_id == ^user.id
+    Repo.all(query)
   end
 
   @doc """

@@ -2,12 +2,13 @@ defmodule AttoLinkWeb.WhiteListController do
   use AttoLinkWeb, :controller
 
   alias AttoLink.Accounts
-  alias AttoLink.Accounts.WhiteList
+  alias AttoLink.Accounts.{WhiteList, User}
 
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do
-    whitelist = Accounts.list_whitelist()
+    %User{} = user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
+    whitelist = Accounts.list_whitelist(user)
     render(conn, "index.json", whitelist: whitelist)
   end
 

@@ -2,12 +2,13 @@ defmodule AttoLinkWeb.ApiController do
   use AttoLinkWeb, :controller
 
   alias AttoLink.Accounts
-  alias AttoLink.Accounts.Api
+  alias AttoLink.Accounts.{Api, User}
 
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do
-    api_key = Accounts.list_api_key()
+    %User{} = user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
+    api_key = Accounts.list_api_key(user)
     render(conn, "index.json", api_key: api_key)
   end
 
