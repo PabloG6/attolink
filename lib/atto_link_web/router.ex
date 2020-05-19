@@ -34,9 +34,10 @@ defmodule AttoLinkWeb.Router do
     resources "/keys", ApiController, except: [:new, :edit, :update]
     resources "/whitelist", WhiteListController, except: [:new, :edit]
     resources "/subscriptions", SubscriptionController, except: [:new, :edit, :update]
-    resources "/account", PermissionsController, except: [:new, :edit]
+    resources "/permissions", PermissionsController, except: [:new, :edit, :show]
     get "/auth/check_token", UserController, :check_token
     put "/subscriptions", SubscriptionController, :update
+    get "/permissions/show", PermissionsController, :show
   end
 
   scope "/v1", AttoLinkWeb do
