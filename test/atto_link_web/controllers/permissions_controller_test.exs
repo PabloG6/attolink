@@ -4,9 +4,9 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
   alias AttoLink.Security
   alias AttoLink.Security.Permissions
 
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
+  @create_attrs %{enable_whitelist: :all}
+  @update_attrs %{enable_whitelist: :restricted}
+  @invalid_attrs %{enable_whitelist: :disable_everything}
 
   def fixture(user_id) do
     {:ok, permissions} =
@@ -38,14 +38,15 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
       conn = get(conn, Routes.permissions_path(conn, :show, id))
 
       assert %{
-               "id" => id
-             } = json_response(conn, 200)["data"]
+               "id" => id,
+                "enable_whitelist" => enable_whitelist} = json_response(conn, 200)["data"]
+      assert enable_whitelist == "all"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn =
         post(conn, Routes.permissions_path(conn, :create),
-          permissions: @invalid_attrs |> Enum.into(%{enable_whitelist: false})
+          permissions: @invalid_attrs
         )
 
       assert json_response(conn, 422)["errors"] != %{}
@@ -59,15 +60,16 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
       conn: conn,
       permissions: %Permissions{id: id} = permissions
     } do
-      conn =
-        put(conn, Routes.permissions_path(conn, :update, permissions), permissions: @update_attrs)
 
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      conn = put(conn, Routes.permissions_path(conn, :update, permissions), permissions: @update_attrs)
+
+      assert %{"id" => ^id, "enable_whitelist" => "restricted"} = json_response(conn, 200)["data"]
 
       conn = get(conn, Routes.permissions_path(conn, :show, id))
 
       assert %{
-               "id" => id
+               "id" => id,
+               "enable_whitelist" => "restricted"
              } = json_response(conn, 200)["data"]
     end
 
@@ -83,14 +85,26 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
 
   describe "delete permissions" do
     setup [:create_user, :sign_in_user, :create_permissions]
-
+    @tag delete_permissions: true
     test "deletes chosen permissions", %{conn: conn, permissions: permissions} do
       conn = delete(conn, Routes.permissions_path(conn, :delete, permissions))
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
-        get(conn, Routes.permissions_path(conn, :show, permissions))
-      end
+      conn = get(conn, Routes.permissions_path(conn, :show, permissions))
+      assert json_response(conn, 404)
+
+    end
+  end
+
+  describe "show permissions" do
+    setup [:create_user, :sign_in_user, :create_permissions]
+    test "display selected permissions", %{conn: conn, permissions: %Permissions{id: id} = permissions} do
+      conn = get(conn, Routes.permissions_path(conn, :show, permissions))
+      assert %{
+        "id" => ^id,
+        "enable_whitelist" => enable_whitelist
+      } = json_response(conn, 200)["data"]
+
     end
   end
 

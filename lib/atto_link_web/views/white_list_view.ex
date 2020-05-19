@@ -11,6 +11,6 @@ defmodule AttoLinkWeb.WhiteListView do
   end
 
   def render("white_list.json", %{white_list: white_list}) do
-    %{id: white_list.id, ip_address: white_list.ip_address}
+    %{id: white_list.id, ip_address: white_list.ip_address, inserted_at: white_list.inserted_at, type: white_list.type}
   end
 end

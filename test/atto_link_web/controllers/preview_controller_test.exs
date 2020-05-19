@@ -42,9 +42,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
     end
   end
 
-  describe "create preview with unauthenticated user" do
-    setup [:authenticate_api]
-
+  describe "create preview with unauthenticated api" do
     test "renders error when user is not logged in", %{conn: conn} do
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
 
@@ -56,9 +54,9 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   end
 
   describe "check api limiter with authenticated user" do
-    setup [:authenticate_api]
+    setup [:authenticate_user, :authenticate_api]
 
-    test "renders error when user is not logged in", %{conn: conn, key: key} do
+    test "check_api_limiter for when user makes an api request.", %{conn: conn, key: key} do
       # call this connection four times.
       conn = recycle(conn) |> put_req_header("apikey", key.api_key)
       conn = get(conn, Routes.preview_path(conn, :create, url: @valid_url))
@@ -84,12 +82,11 @@ defmodule AttoLinkWeb.PreviewControllerTest do
       conn
       |> put_req_header("authorization", "bearer: " <> token)
 
-    {:ok, conn: conn, user: user}
+    %{conn: conn, user: user}
   end
 
-  defp authenticate_api(%{conn: conn}) do
-    {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+  defp authenticate_api(%{conn: conn, user: user}) do
     {:ok, key} = Accounts.create_api(%{user_id: user.id})
-    {:ok, conn: conn, user: user, key: key}
+    %{conn: conn, key: key}
   end
 end

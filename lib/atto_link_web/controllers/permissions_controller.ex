@@ -1,9 +1,9 @@
 defmodule AttoLinkWeb.PermissionsController do
   use AttoLinkWeb, :controller
-
+  import AttoLink.Repo, only: [preload: 2], warn: false
   alias AttoLink.Security
   alias AttoLink.Security.Permissions
-
+  alias AttoLink.Auth
   action_fallback AttoLinkWeb.FallbackController
   def index(conn, _params) do
     permissions = Security.list_permissions()
@@ -37,10 +37,20 @@ defmodule AttoLinkWeb.PermissionsController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    permissions = Security.get_permissions!(id)
-    render(conn, "show.json", permissions: permissions)
+  def show(conn, _params) do
+    user = Auth.Guardian.Plug.current_resource(conn) |> preload(:permissions)
+    permissions = user.permissions
+    if permissions == nil do
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(:not_found, Poison.encode!(%{message: "no permissions found"}))
+    else
+      render(conn, "show.json", permissions: permissions)
+    end
   end
+
+
+
 
   def update(conn, %{"permissions" => permissions_params}) do
     %AttoLink.Accounts.User{id: id} = AttoLink.Auth.Guardian.Plug.current_resource(conn)

@@ -19,7 +19,7 @@ defmodule AttoLink.Accounts.WhiteList do
     |> validate_required([:user_id, :ip_address, :type])
     |> validate_type(attrs)
     |> foreign_key_constraint(:user_id)
-    |> unique_constraint(:ip_address, name: :whitelist_ip_address_user_index)
+    |> unique_constraint(:ip_address, name: :whitelist_user_id_ip_address_index, message: "This IP adress has already been taken")
   end
 
 

@@ -19,7 +19,10 @@ defmodule AttoLinkWeb.UserController do
              customer: customer,
              items: [%{plan: plan_id}],
              default_payment_method: pm_id
-           }) do
+           }),
+           {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
+
+           do
       conn
       |> put_status(:created)
       |> verify_user(user)
@@ -31,7 +34,9 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+    with {:ok, %User{id: id} = user} <- Accounts.create_user(user_params),
+         {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
+    do
       conn
       |> put_status(:created)
       |> verify_user(user)
@@ -86,13 +91,11 @@ defmodule AttoLinkWeb.UserController do
   end
 
   @spec verify_user(conn :: Plug.Conn.t(), user :: User.t()) :: Plug.Conn.t()
-  defp verify_user(conn, %User{id: id} = user) do
+  defp verify_user(conn, %User{} = user) do
     with {:ok, _reply} <- Accounts.authenticate_user(user),
          conn <- AttoLink.Auth.Guardian.Plug.sign_in(conn, user),
-         {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id}),
          token <- AttoLink.Auth.Guardian.Plug.current_token(conn) do
       conn
-      |> put_status(:created)
       |> put_view(AttoLinkWeb.UserView)
       |> render(:login, user: user, token: token)
     else
