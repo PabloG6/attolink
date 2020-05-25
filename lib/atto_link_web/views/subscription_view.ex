@@ -15,4 +15,17 @@ defmodule AttoLinkWeb.SubscriptionsView do
       id: subscriptions.id
     }
   end
+
+  def render("plans.json", %{plans: plans}) do
+    %{data: render_many(plans, SubscriptionsView, "plan.json", as: :plan)}
+  end
+
+  def render("plan.json", %{plan: %Stripe.Plan{id: id, nickname: nickname, amount: amount, currency: currency}}) do
+    %{
+      id: id,
+      nickname: nickname,
+      amount: amount,
+      currency: currency
+    }
+  end
 end

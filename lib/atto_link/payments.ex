@@ -21,6 +21,11 @@ defmodule AttoLink.Payments do
     Repo.all(Subscription)
   end
 
+  def list_plans do
+    {:ok, %Stripe.List{data: plans}} = Stripe.Plan.list()
+    plans
+  end
+
   @doc """
   Gets a single subscription.
 

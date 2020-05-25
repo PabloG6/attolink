@@ -29,7 +29,7 @@ defmodule AttoLinkWeb.UserController do
     else
       {:error, %Stripe.Error{code: code, message: message}} ->
         conn
-        |> send_resp(code, Poison.encode!(%{message: message}))
+        |> send_resp(code, Poison.encode!(%{code: code, message: message}))
     end
   end
 

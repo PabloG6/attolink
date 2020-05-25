@@ -4,16 +4,23 @@ defmodule AttoLinkWeb.SubscriptionController do
   action_fallback AttoLinkWeb.FallbackController
   alias AttoLink.Accounts
   alias AttoLink.Payments
-
-  def index(_conn, _params) do
-    # subscriptions = Payments.list_subscriptions()
-    # render(conn, "index.json", subscriptions: subscriptions)
+  def index(conn, _params) do
+   plans = Payments.list_plans()
+   conn
+   |> put_status(:ok)
+   |> put_view(AttoLinkWeb.SubscriptionsView)
+   |> render(:plans, plans: plans)
   end
 
   def create(conn, %{
         "subscriptions" =>
-          %{"payment_method_id" => pm_id, "plan_id" => plan_id} = _subscriptions_params
+          %{"payment_method_id" => pm_id, "plan_id" => plan_id
+          
+          
+          } = _subscriptions_params
       }) do
+
+
     with %Accounts.User{email: email} = user <-
            AttoLink.Auth.Guardian.Plug.current_resource(conn),
          {:ok, %Stripe.Customer{id: cus_id} = customer} <-
@@ -31,7 +38,7 @@ defmodule AttoLinkWeb.SubscriptionController do
          {:ok, %Accounts.User{}} <-
            Accounts.update_user_plan(user, %{
              customer_id: cus_id,
-             plan: String.downcase(nickname) |> String.to_atom()
+             plan: String.downcase(nickname) |> convert_to_atom()
            }),
          {:ok, %Payments.Subscription{} = subscription} <-
            Payments.create_subscription(%{
@@ -46,6 +53,7 @@ defmodule AttoLinkWeb.SubscriptionController do
       |> render("show.json", subscriptions: subscription)
     end
   end
+
 
   def show(conn, _params) do
     user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
@@ -88,6 +96,16 @@ defmodule AttoLinkWeb.SubscriptionController do
          {:ok, %Payments.Subscription{}} <-
            Payments.update_subscription(subscriptions, %{canceled: true, nickname: "Free"}) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+
+  defp convert_to_atom(atom) do
+    try do
+      String.to_existing_atom(atom)
+     rescue
+      ArgumentError ->
+          String.to_atom(atom)
     end
   end
 end
