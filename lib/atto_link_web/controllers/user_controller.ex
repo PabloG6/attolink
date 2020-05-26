@@ -4,36 +4,44 @@ defmodule AttoLinkWeb.UserController do
   alias AttoLink.Accounts
   alias AttoLink.Accounts.User
   action_fallback AttoLinkWeb.FallbackController
-
+  alias AttoLink.Auth
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     render(conn, "show.json", user: user)
   end
 
-  def create(conn, %{"user" => user_params, "payment" => %{payment_method: pm_id, plan: plan_id}}) do
-    with {:ok, %User{email: email} = user} <- Accounts.create_user(user_params),
-         {:ok, %Stripe.Customer{id: id} = customer} <- Stripe.Customer.create(%{email: email}),
-         {:ok, %User{}} <- Accounts.update_user(user, %{customer_id: id}),
+  def create(conn, %{"user" => user_params, "payment" => %{"payment_method_id" => pm_id, "plan" => plan_id}}) do
+    IO.puts "hello world"
+    with {:ok, %User{email: email, id: id} = user} <- Accounts.create_user(user_params),
+         {:ok, %Stripe.Customer{id: customer_id} = customer} <- Stripe.Customer.create(%{email: email, payment_method: pm_id}),
          {:ok, %Stripe.Subscription{}} <-
            Stripe.Subscription.create(%{
              customer: customer,
              items: [%{plan: plan_id}],
              default_payment_method: pm_id
            }),
-           {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
 
+           {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
+           {:ok, %User{} = user} <- Accounts.update_user(user, %{customer_id: customer_id, plan: String.downcase(nickname) |> convert_to_atom}),
+           {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
            do
+      IO.inspect user
+
       conn
       |> put_status(:created)
       |> verify_user(user)
     else
       {:error, %Stripe.Error{code: code, message: message}} ->
+        IO.inspect code
+        IO.puts message
         conn
-        |> send_resp(code, Poison.encode!(%{code: code, message: message}))
+        |> send_resp(500, Poison.encode!(%{code: code, message: message}))
+      err -> err
     end
   end
 
   def create(conn, %{"user" => user_params}) do
+    IO.puts "inside create lol"
     with {:ok, %User{id: id} = user} <- Accounts.create_user(user_params),
          {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
     do
@@ -105,10 +113,12 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def check_token(conn, _params) do
-        with %User{} <- Guardian.Plug.current_resource(conn) do
+
+        with %User{} = user <- Auth.Guardian.Plug.current_resource(conn) do
           conn
-          |> resp(200, Poison.encode!(%{message: :token_valid}))
-          |> send_resp()
+          |>put_status(:ok)
+          |> put_view(AttoLinkWeb.UserView)
+          |> render(:show, user: user)
         else
           nil ->
             conn
@@ -116,4 +126,15 @@ defmodule AttoLinkWeb.UserController do
             |> send_resp()
         end
   end
+
+  defp convert_to_atom(atom) do
+    try do
+      String.to_existing_atom(atom)
+    rescue
+      ArgumentError -> String.to_atom(atom)
+    end
+
+  end
+
+
 end
