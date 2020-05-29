@@ -1,6 +1,6 @@
 defmodule AttoLink.Plug.WhiteList do
   import Plug.Conn
-  import AttoLink.Auth.Api, only: [current_user: 1]
+  import AttoLink.Auth.API
   alias AttoLink.Accounts
   @spec init(Keyword.t()) :: Keyword.t()
   def init(options), do: options

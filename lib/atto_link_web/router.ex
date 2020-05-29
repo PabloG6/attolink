@@ -14,7 +14,7 @@ defmodule AttoLinkWeb.Router do
   end
 
   pipeline :api_auth do
-    plug AttoLink.Auth.Api
+    plug AttoLink.Auth.API
   end
 
   pipeline :white_list do

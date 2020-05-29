@@ -1,23 +1,16 @@
-# Enum to determine the users subscription type.
-import EctoEnum
 
-defenum(
-  Plan,
-  :plan,
-  [:free, :basic, :premium, :enterprise]
-)
 
 defmodule AttoLink.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias AttoLink.Accounts
+  alias AttoLink.Payments
   @primary_key {:id, :binary_id, autogenerate: true}
 
   schema "user" do
     field :email, :string
     field :password_hash, :string
     field :password, :string, virtual: true
-    field :plan, Plan, default: :free
     field :customer_id, :string
     has_one :subscription, Payments.Subscription
     has_many :api_keys, Accounts.Api

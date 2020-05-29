@@ -232,7 +232,8 @@ defmodule AttoLink.Accounts do
     with %Api{} = api <-
            Repo.get_by(Api, api_key: api_key)
            |> Repo.preload(:user) do
-      {:ok, api.user}
+        user = api.user |> Repo.preload(:subscription)
+      {:ok, user}
     else
       nil ->
         {:error, :no_user}

@@ -11,8 +11,12 @@ defmodule AttoLinkWeb.SubscriptionsView do
   end
 
   def render("subscriptions.json", %{subscriptions: subscriptions}) do
+    IO.inspect subscriptions
     %{
-      id: subscriptions.id
+      id: subscriptions.id,
+      nickname: subscriptions.nickname,
+      sub_id: subscriptions.subscription_id,
+
     }
   end
 

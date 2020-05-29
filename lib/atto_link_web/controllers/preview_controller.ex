@@ -10,8 +10,8 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url, "cacheUrl" => "true"} = _query_params) do
-    {:ok, user} = AttoLink.Auth.Api.current_user(conn)
-    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.plan)
+    {:ok, user} = AttoLink.Auth.API.current_user(conn)
+    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.subscription.nickname)
 
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
@@ -57,8 +57,8 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url, "cacheUrl" => "true", "async" => "true"} = params) do
-    {:ok, user} = AttoLink.Auth.Api.current_user(params)
-    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.plan)
+    {:ok, user} = AttoLink.Auth.API.current_user(params)
+    %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.subscription.nickname)
 
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
@@ -86,8 +86,9 @@ defmodule AttoLinkWeb.PreviewController do
   end
 
   def create(conn, %{"url" => url} = _query_params) do
-    {:ok, user} = AttoLink.Auth.Api.current_user(conn)
-    %AttoLink.Atto.Plan{preview_limit: preview_limit} = AttoLink.Atto.Plan.plan_type(user.plan)
+    {:ok, user} = AttoLink.Auth.API.current_user(conn)
+
+    %AttoLink.Atto.Plan{preview_limit: preview_limit} = AttoLink.Atto.Plan.plan_type(user.subscription.nickname)
 
     with {:allow, count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),

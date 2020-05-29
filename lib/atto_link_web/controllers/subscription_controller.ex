@@ -4,6 +4,7 @@ defmodule AttoLinkWeb.SubscriptionController do
   action_fallback AttoLinkWeb.FallbackController
   alias AttoLink.Accounts
   alias AttoLink.Payments
+
   def index(conn, _params) do
    plans = Payments.list_plans()
    conn
@@ -15,8 +16,8 @@ defmodule AttoLinkWeb.SubscriptionController do
   def create(conn, %{
         "subscriptions" =>
           %{"payment_method_id" => pm_id, "plan_id" => plan_id
-          
-          
+
+
           } = _subscriptions_params
       }) do
 
@@ -69,19 +70,22 @@ defmodule AttoLinkWeb.SubscriptionController do
          {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: items_list}}} <-
            Stripe.Subscription.retrieve(subscription_id),
          item <- Enum.at(items_list, 0),
-         {:ok, %Stripe.Subscription{id: sub_id,items: %Stripe.List{data: [sub_item | _tail]}} = subscription} <- Stripe.Subscription.update(sub_id, %{
+         {:ok, %Stripe.Subscription{id: sub_id,items: %Stripe.List{data: [sub_item | _tail]}}} <- Stripe.Subscription.update(sub_id, %{
                                                                                   cancel_at_period_end: false,
                                                                                   items: [%{id: item.id, plan: plan_id}]
                                                                                 }),
-         {:ok, %Payments.Subscription{}} <- Payments.update_subscription(payments, %{subscription_id: sub_id, nickname: sub_item.plan.nickname,
+         {:ok, %Payments.Subscription{} = updated_payments} <- Payments.update_subscription(payments, %{subscription_id: sub_id, nickname: sub_item.plan.nickname |> String.downcase |> convert_to_atom(),
                                             plan_id: plan_id})
           do
 
                 conn
                 |> put_status(:ok)
                 |> put_view(AttoLinkWeb.SubscriptionsView)
-                |> render("show.json", subscriptions: subscription)
-
+                |> render("show.json", subscriptions: updated_payments)
+          else
+            error ->
+              IO.inspect error
+              error
 
     end
   end
