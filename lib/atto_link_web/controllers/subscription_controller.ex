@@ -56,6 +56,7 @@ defmodule AttoLinkWeb.SubscriptionController do
   end
 
 
+  @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
   def show(conn, _params) do
     user = AttoLink.Auth.Guardian.Plug.current_resource(conn)
     subscriptions = Payments.get_subscriptions_by(user_id: user.id)

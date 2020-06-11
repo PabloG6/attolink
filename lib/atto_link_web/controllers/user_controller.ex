@@ -49,10 +49,15 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  def create(conn, %{"user" => user_params}) do
+  def create(conn, %{"user" => user_params, "payments" => %{"plan" => plan_id}}) do
     IO.puts "inside create lol"
     with {:ok, %User{id: id} = user} <- Accounts.create_user(user_params),
-         {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
+          {:ok, %Payments.Subscription{}} <-
+          Payments.create_subscription(%{
+          user_id: id,
+          plan_id: plan_id,
+          nickname: :free}),
+            {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
     do
       conn
       |> put_status(:created)

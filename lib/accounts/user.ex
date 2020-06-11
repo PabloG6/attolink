@@ -22,7 +22,7 @@ defmodule AttoLink.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :plan, :customer_id])
+    |> cast(attrs, [:email, :password, :customer_id])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
     |> put_password_hash
@@ -30,7 +30,7 @@ defmodule AttoLink.Accounts.User do
 
   def update_changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password, :plan, :customer_id])
+    |> cast(attrs, [:email, :password, :customer_id])
     |> unique_constraint(:email)
   end
 
