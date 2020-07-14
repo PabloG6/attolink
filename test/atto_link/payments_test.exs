@@ -3,13 +3,13 @@ defmodule AttoLink.PaymentsTest do
 
   alias AttoLink.Payments
   alias AttoLink.Accounts
+
   describe "subscription" do
     alias AttoLink.Payments.Subscription
 
     @valid_attrs %{
       canceled: true,
       customer_id: "some customer",
-      nickname: "Free",
       subscription_id: "some subscription_id"
     }
     @update_attrs %{
@@ -21,10 +21,11 @@ defmodule AttoLink.PaymentsTest do
 
     def subscription_fixture(attrs \\ %{}) do
       {:ok, user} = Accounts.create_user(%{email: "someemail@gmail.com", password: "password"})
+
       {:ok, subscription} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Enum.into(%{user_id: user.id})
+        |> Enum.into(%{user_id: user.id, plan_id: "plan_free", nickname: :free})
         |> Payments.create_subscription()
 
       subscription
@@ -42,8 +43,12 @@ defmodule AttoLink.PaymentsTest do
     end
 
     test "create_subscription/1 with valid data creates a subscription" do
-      {:ok, %Accounts.User{id: id}} = Accounts.create_user(%{email: "grammy@email.com", password: "password"})
-      assert {:ok, %Subscription{} = subscription} = Payments.create_subscription(@valid_attrs |> Enum.into(%{user_id: id}))
+      {:ok, %Accounts.User{id: id}} =
+        Accounts.create_user(%{email: "grammy@email.com", password: "password"})
+
+      assert {:ok, %Subscription{} = subscription} =
+               Payments.create_subscription(@valid_attrs |> Enum.into(%{user_id: id, plan_id: "plan_free"}))
+
       assert subscription.canceled == true
       assert subscription.customer_id == "some customer"
       assert subscription.subscription_id == "some subscription_id"

@@ -21,3 +21,7 @@ config :bcrypt_elixir, :log_rounds, 4
 config :hammer,
   backend:
     {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10, pool_size: 2]}
+
+config :sendgrid,
+  api_key: "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",
+  sandbox_enable: true

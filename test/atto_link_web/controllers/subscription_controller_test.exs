@@ -31,8 +31,6 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       payment_method_id: payment_method_id,
       user: _user
     } do
-
-
       {:ok, %Stripe.Plan{id: plan_id}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
 
       conn =
@@ -45,7 +43,6 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
 
       assert json_response(conn, 201)
     end
-
   end
 
   describe "downgrade and upgrade your subscription" do
@@ -76,7 +73,10 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       assert json_response(conn, 200)
     end
 
-    test "downgrade subscription from enterprise plan to basic plan. " , %{conn: conn, payment_method_id: payment_method_id}do
+    test "downgrade subscription from enterprise plan to basic plan. ", %{
+      conn: conn,
+      payment_method_id: payment_method_id
+    } do
       {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_HGceCYomvatDSw")
       {:ok, %Stripe.Plan{id: basic_plan}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
 

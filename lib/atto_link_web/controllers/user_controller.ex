@@ -8,61 +8,88 @@ defmodule AttoLinkWeb.UserController do
   alias AttoLink.Repo
   action_fallback AttoLinkWeb.FallbackController
 
-
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
+    user = user |> Repo.preload(:subscription)
     render(conn, "show.json", user: user)
   end
 
-  def create(conn, %{"user" => user_params, "payment" => %{"payment_method_id" => pm_id, "plan" => plan_id}}) do
-    IO.puts "hello world"
+  def create(conn, %{
+        "user" => user_params,
+        "payment" => %{"payment_method_id" => pm_id, "plan" => plan_id}
+      }) do
+
     with {:ok, %User{email: email, id: id} = user} <- Accounts.create_user(user_params),
-         {:ok, %Stripe.Customer{id: customer_id} = customer} <- Stripe.Customer.create(%{email: email, payment_method: pm_id}),
-         {:ok, %Stripe.Subscription{id: subscription_id, }} <-
+         {:ok, %Stripe.Customer{id: customer_id} = customer} <-
+           Stripe.Customer.create(%{email: email, payment_method: pm_id}),
+         {:ok, %Stripe.Subscription{id: subscription_id}} <-
            Stripe.Subscription.create(%{
              customer: customer,
              items: [%{plan: plan_id}],
              default_payment_method: pm_id
            }),
-
-           {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
-           {:ok, %User{} = user} <- Accounts.update_user(user, %{customer_id: customer_id, plan: String.downcase(nickname) |> convert_to_atom}),
-           {:ok, %Payments.Subscription{}} <-
-             Payments.create_subscription(%{subscription_id: subscription_id,
+         {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
+         {:ok, %User{} = user} <-
+           Accounts.update_user(user, %{
+             customer_id: customer_id,
+             plan: String.downcase(nickname) |> convert_to_atom
+           }),
+         {:ok, %Payments.Subscription{}} <-
+           Payments.create_subscription(%{
+             subscription_id: subscription_id,
              customer_id: customer_id,
              user_id: id,
-             nickname: String.downcase(nickname) |> convert_to_atom}),
-           {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
-           do
-      IO.inspect user
+             nickname: String.downcase(nickname) |> convert_to_atom
+           }),
+         {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id}) do
 
       conn
       |> put_status(:created)
       |> verify_user(user)
     else
       {:error, %Stripe.Error{code: code, message: message}} ->
-        IO.inspect code
-        IO.puts message
         conn
         |> send_resp(500, Poison.encode!(%{code: code, message: message}))
-      err -> err
+
+      err ->
+        err
     end
   end
 
-  def create(conn, %{"user" => user_params, "payments" => %{"plan" => plan_id}}) do
-    IO.puts "inside create lol"
+  def create(conn, %{"user" => user_params, "payments" => %{"plan" => plan_id}} = _params) do
+
     with {:ok, %User{id: id} = user} <- Accounts.create_user(user_params),
-          {:ok, %Payments.Subscription{}} <-
-          Payments.create_subscription(%{
-          user_id: id,
-          plan_id: plan_id,
-          nickname: :free}),
-            {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id})
-    do
+         {:ok, %Payments.Subscription{}} <-
+           Payments.create_subscription(%{
+             user_id: id,
+             plan_id: plan_id,
+             nickname: :free
+           }),
+          :ok <- send_email(user)
+         do
+
+
       conn
       |> put_status(:created)
       |> verify_user(user)
+
+         else
+          error
+            ->
+               error
     end
+  end
+
+  defp send_email(%AttoLink.Accounts.User{email: email} = user) do
+    with {:ok, %AttoLink.Comms.ConfirmEmail{id: id}} <- AttoLink.Comms.create_email(%{user: user}),
+         :ok <- AttoLink.Comms.send_confirm_email(email: email, id: id)
+         do
+           :ok
+         else
+          err ->
+
+            {:error, :sendgrid, err}
+         end
   end
 
   def login(conn, %{"user" => %{"email" => email, "password" => password}} = _params) do
@@ -76,17 +103,17 @@ defmodule AttoLinkWeb.UserController do
         |> put_status(:unauthorized)
         |> put_view(AttoLinkWeb.ErrorView)
         |> render(:login)
-
     end
   end
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
+    user = Accounts.get_user!(id) |> Repo.preload(:subscription)
+
     render(conn, "show.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get_user!(id)
+    user = Accounts.get_user!(id) |> Repo.preload(:subscription)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
@@ -94,10 +121,13 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def delete(conn, _params) do
+
+
     with %User{} = user <- Guardian.Plug.current_resource(conn),
-         {:ok, %User{}} <- Accounts.delete_user(user) do
+          {:ok, %User{}} <- delete_user(user) do
       send_resp(conn, :no_content, "")
     else
+
       nil ->
         conn
         |> resp(
@@ -109,6 +139,31 @@ defmodule AttoLinkWeb.UserController do
         )
         |> send_resp()
         |> halt()
+      {:error, %Stripe.Error{}} ->
+        conn
+        |> resp(500, Poison.encode!(%{
+            message: "An error occured when deleting your subscription, try again later",
+            responde_code: :internal_server_error
+        }))
+      end
+  end
+
+  defp delete_user(%User{customer_id: nil} = user) do
+    with {:ok, user} <- Accounts.delete_user(user) do
+      {:ok, user}
+    else
+      error
+        -> error
+    end
+  end
+
+  defp delete_user(%User{customer_id: customer_id} = user) do
+    with {:ok, _customer} <- Stripe.Customer.delete(customer_id),
+         {:ok, user} <- Accounts.delete_user(user) do
+          {:ok, user}
+         else
+          error
+            -> error
     end
   end
 
@@ -127,19 +182,19 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def check_token(conn, _params) do
+    with %User{} = user <- Auth.Guardian.Plug.current_resource(conn) do
+      user = user |> Repo.preload([:subscription])
 
-        with %User{} = user <- Auth.Guardian.Plug.current_resource(conn) do
-          user = user |> Repo.preload([:subscription])
-          conn
-          |>put_status(:ok)
-          |> put_view(AttoLinkWeb.UserView)
-          |> render(:show, user: user)
-        else
-          nil ->
-            conn
-            |> resp(401, Poison.encode! %{message: :token_invalid})
-            |> send_resp()
-        end
+      conn
+      |> put_status(:ok)
+      |> put_view(AttoLinkWeb.UserView)
+      |> render(:show, user: user)
+    else
+      nil ->
+        conn
+        |> resp(401, Poison.encode!(%{message: :token_invalid}))
+        |> send_resp()
+    end
   end
 
   defp convert_to_atom(atom) do
@@ -148,8 +203,5 @@ defmodule AttoLinkWeb.UserController do
     rescue
       ArgumentError -> String.to_atom(atom)
     end
-
   end
-
-
 end

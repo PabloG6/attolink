@@ -11,8 +11,8 @@ defmodule AttoLinkWeb.PreviewController do
 
   def create(conn, %{"url" => url, "cacheUrl" => "true"} = _query_params) do
     {:ok, user} = AttoLink.Auth.API.current_user(conn)
+    user = user |> AttoLink.Repo.preload(:subscription)
     %Atto.Plan{preview_limit: preview_limit} = Atto.Plan.plan_type(user.subscription.nickname)
-
     with {:allow, _count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),
          {:ok, %LinkPreview.Page{} = page_preview} <- Atto.create_preview(url),
@@ -81,6 +81,7 @@ defmodule AttoLinkWeb.PreviewController do
         error
 
       error ->
+
         error
     end
   end
@@ -88,7 +89,8 @@ defmodule AttoLinkWeb.PreviewController do
   def create(conn, %{"url" => url} = _query_params) do
     {:ok, user} = AttoLink.Auth.API.current_user(conn)
 
-    %AttoLink.Atto.Plan{preview_limit: preview_limit} = AttoLink.Atto.Plan.plan_type(user.subscription.nickname)
+    %AttoLink.Atto.Plan{preview_limit: preview_limit} =
+      AttoLink.Atto.Plan.plan_type(user.subscription.nickname)
 
     with {:allow, count} <-
            Hammer.check_rate("link_preview:#{user.id}", 60_000 * 60, preview_limit),

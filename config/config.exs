@@ -2,7 +2,7 @@
 # and its dependencies with the aid of the Mix.Config module.
 #
 # This configuration file is loaded before any dependency and
-# is restricted to this project.
+# is restricted to this project
 
 # General application configuration
 use Mix.Config
@@ -38,4 +38,7 @@ config :atto_link, AttoLink.Auth.Guardian,
 
 config :stripity_stripe, api_key: "sk_test_VjpBvPBlY27yLOXU8r5lZEKi005iVURh37"
 
+
+config :sendgrid,
+  api_key: "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"
 import_config "#{Mix.env()}.exs"

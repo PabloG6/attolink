@@ -15,7 +15,7 @@ defmodule AttoLink.Payments.Subscription do
 
   @doc false
   def changeset(subscription, attrs) do
-    IO.inspect attrs
+
     subscription
     |> cast(attrs, [:subscription_id, :customer_id, :canceled, :nickname, :user_id, :plan_id])
     |> validate_required([:canceled, :user_id, :nickname, :subscription_id, :plan_id])

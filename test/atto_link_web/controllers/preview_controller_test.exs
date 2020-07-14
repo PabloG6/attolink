@@ -2,6 +2,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   use AttoLinkWeb.ConnCase
 
   alias AttoLink.Accounts
+  alias AttoLink.Payments
   @valid_url "https://pusher.com/"
 
   setup %{conn: conn} do
@@ -76,6 +77,11 @@ defmodule AttoLinkWeb.PreviewControllerTest do
 
   defp authenticate_user(%{conn: conn}) do
     {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+    {:ok, _plan} = Payments.create_subscription(%{
+                        user_id: user.id,
+                        nickname: :free,
+                        plan_id: "plan_free"
+                  })
     {:ok, token, _claims} = AttoLink.Auth.Guardian.encode_and_sign(user)
 
     conn =

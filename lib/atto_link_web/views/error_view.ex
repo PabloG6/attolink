@@ -24,7 +24,6 @@ defmodule AttoLinkWeb.ErrorView do
 
   def render("login.json", %{message: message}) do
     %{detail: %{message: message}}
-
   end
 
   def render("401.json", %{message: message}) do

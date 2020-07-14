@@ -66,7 +66,8 @@ defmodule AttoLink.MixProject do
       {:corsica, "~> 1.1.3"},
       {:cors_plug, "~> 2.0"},
       {:recase, "~> 0.5"},
-
+      {:sendgrid, "~> 2.0"},
+      {:httpoison, "~> 1.6"},
       {:stripity_stripe,
        git: "https://github.com/PabloG6/stripity_stripe",
        ref: "afe4c3e771e5627a97e361190b45d2d9b68ba9df"},

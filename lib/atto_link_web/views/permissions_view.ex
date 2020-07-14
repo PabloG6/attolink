@@ -16,6 +16,4 @@ defmodule AttoLinkWeb.PermissionsView do
       enable_whitelist: permissions.enable_whitelist
     }
   end
-
-
 end

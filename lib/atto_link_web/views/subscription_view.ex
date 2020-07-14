@@ -11,12 +11,11 @@ defmodule AttoLinkWeb.SubscriptionsView do
   end
 
   def render("subscriptions.json", %{subscriptions: subscriptions}) do
-    IO.inspect subscriptions
+
     %{
       id: subscriptions.id,
       nickname: subscriptions.nickname,
-      sub_id: subscriptions.subscription_id,
-
+      sub_id: subscriptions.subscription_id
     }
   end
 
@@ -24,7 +23,9 @@ defmodule AttoLinkWeb.SubscriptionsView do
     %{data: render_many(plans, SubscriptionsView, "plan.json", as: :plan)}
   end
 
-  def render("plan.json", %{plan: %Stripe.Plan{id: id, nickname: nickname, amount: amount, currency: currency}}) do
+  def render("plan.json", %{
+        plan: %Stripe.Plan{id: id, nickname: nickname, amount: amount, currency: currency}
+      }) do
     %{
       id: id,
       nickname: nickname,

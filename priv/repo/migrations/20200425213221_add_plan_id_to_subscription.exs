@@ -5,7 +5,6 @@ defmodule AttoLink.Repo.Migrations.AddPlanIdToSubscription do
     alter table(:subscription) do
       add :plan_id, :string
     end
-
   end
 
   def down do

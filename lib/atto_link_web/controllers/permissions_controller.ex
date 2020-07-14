@@ -5,6 +5,7 @@ defmodule AttoLinkWeb.PermissionsController do
   alias AttoLink.Security.Permissions
   alias AttoLink.Auth
   action_fallback AttoLinkWeb.FallbackController
+
   def index(conn, _params) do
     permissions = Security.list_permissions()
     render(conn, "index.json", permissions: permissions)
@@ -17,7 +18,6 @@ defmodule AttoLinkWeb.PermissionsController do
            Security.create_permissions(permissions_params |> Enum.into(%{"user_id" => user.id})) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.permissions_path(conn, :show, permissions))
       |> render("show.json", permissions: permissions)
     else
       {:error, %Ecto.Changeset{errors: [user_id: _user_error]}} ->
@@ -40,6 +40,7 @@ defmodule AttoLinkWeb.PermissionsController do
   def show(conn, _params) do
     user = Auth.Guardian.Plug.current_resource(conn) |> preload(:permissions)
     permissions = user.permissions
+
     if permissions == nil do
       conn
       |> put_resp_content_type("application/json")
@@ -48,9 +49,6 @@ defmodule AttoLinkWeb.PermissionsController do
       render(conn, "show.json", permissions: permissions)
     end
   end
-
-
-
 
   def update(conn, %{"permissions" => permissions_params}) do
     %AttoLink.Accounts.User{id: id} = AttoLink.Auth.Guardian.Plug.current_resource(conn)

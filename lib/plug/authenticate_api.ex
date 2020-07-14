@@ -2,7 +2,6 @@ defmodule AttoLink.Auth.API do
   import Plug.Conn
   alias AttoLink.Accounts
 
-
   @spec init(Keyword.t()) :: Keyword.t()
   def init(options), do: options
 

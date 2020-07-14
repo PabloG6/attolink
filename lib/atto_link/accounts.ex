@@ -82,7 +82,7 @@ defmodule AttoLink.Accounts do
   """
   def update_user(%User{} = user, attrs) do
     user
-    |> User.changeset(attrs)
+    |> User.update_changeset(attrs)
     |> Repo.update()
   end
 
@@ -132,6 +132,7 @@ defmodule AttoLink.Accounts do
     Repo.get_by(User, info)
   end
 
+
   alias AttoLink.Accounts.Api
 
   @doc """
@@ -144,8 +145,9 @@ defmodule AttoLink.Accounts do
 
   """
   def list_api_key(user) do
-    query = from u in Api,
-            where: u.user_id == ^user.id
+    query =
+      from u in Api,
+        where: u.user_id == ^user.id
 
     Repo.all(query)
   end
@@ -232,11 +234,19 @@ defmodule AttoLink.Accounts do
     with %Api{} = api <-
            Repo.get_by(Api, api_key: api_key)
            |> Repo.preload(:user) do
-        user = api.user |> Repo.preload(:subscription)
+      user = api.user |> Repo.preload(:subscription)
       {:ok, user}
     else
       nil ->
         {:error, :no_user}
+    end
+  end
+
+  def get_user_by(info \\ []) do
+    with %User{} = user<- Repo.get_by(User, info) do
+      {:ok, user}
+    else
+      nil -> {:error, :user_not_found}
     end
   end
 
@@ -252,8 +262,10 @@ defmodule AttoLink.Accounts do
 
   """
   def list_whitelist(user) do
-    query = from w in WhiteList,
-            where: w.user_id == ^user.id
+    query =
+      from w in WhiteList,
+        where: w.user_id == ^user.id
+
     Repo.all(query)
   end
 

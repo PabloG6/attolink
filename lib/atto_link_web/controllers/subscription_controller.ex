@@ -6,22 +6,18 @@ defmodule AttoLinkWeb.SubscriptionController do
   alias AttoLink.Payments
 
   def index(conn, _params) do
-   plans = Payments.list_plans()
-   conn
-   |> put_status(:ok)
-   |> put_view(AttoLinkWeb.SubscriptionsView)
-   |> render(:plans, plans: plans)
+    plans = Payments.list_plans()
+
+    conn
+    |> put_status(:ok)
+    |> put_view(AttoLinkWeb.SubscriptionsView)
+    |> render(:plans, plans: plans)
   end
 
   def create(conn, %{
         "subscriptions" =>
-          %{"payment_method_id" => pm_id, "plan_id" => plan_id
-
-
-          } = _subscriptions_params
+          %{"payment_method_id" => pm_id, "plan_id" => plan_id} = _subscriptions_params
       }) do
-
-
     with %Accounts.User{email: email} = user <-
            AttoLink.Auth.Guardian.Plug.current_resource(conn),
          {:ok, %Stripe.Customer{id: cus_id} = customer} <-
@@ -35,7 +31,7 @@ defmodule AttoLinkWeb.SubscriptionController do
              customer: customer,
              items: [%{plan: plan_id}]
            }),
-         {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
+         {:ok, %Stripe.Plan{nickname: nickname, id: plan_id}} <- Stripe.Plan.retrieve(plan_id),
          {:ok, %Accounts.User{}} <-
            Accounts.update_user_plan(user, %{
              customer_id: cus_id,
@@ -45,7 +41,8 @@ defmodule AttoLinkWeb.SubscriptionController do
            Payments.create_subscription(%{
              subscription_id: sub_id,
              user_id: user.id,
-             nickname: nickname,
+             plan_id: plan_id,
+             nickname: nickname |> String.downcase |> convert_to_atom,
              customer_id: cus_id
            }) do
       conn
@@ -54,7 +51,6 @@ defmodule AttoLinkWeb.SubscriptionController do
       |> render("show.json", subscriptions: subscription)
     end
   end
-
 
   @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
   def show(conn, _params) do
@@ -71,23 +67,24 @@ defmodule AttoLinkWeb.SubscriptionController do
          {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: items_list}}} <-
            Stripe.Subscription.retrieve(subscription_id),
          item <- Enum.at(items_list, 0),
-         {:ok, %Stripe.Subscription{id: sub_id,items: %Stripe.List{data: [sub_item | _tail]}}} <- Stripe.Subscription.update(sub_id, %{
-                                                                                  cancel_at_period_end: false,
-                                                                                  items: [%{id: item.id, plan: plan_id}]
-                                                                                }),
-         {:ok, %Payments.Subscription{} = updated_payments} <- Payments.update_subscription(payments, %{subscription_id: sub_id, nickname: sub_item.plan.nickname |> String.downcase |> convert_to_atom(),
-                                            plan_id: plan_id})
-          do
-
-                conn
-                |> put_status(:ok)
-                |> put_view(AttoLinkWeb.SubscriptionsView)
-                |> render("show.json", subscriptions: updated_payments)
-          else
-            error ->
-              IO.inspect error
-              error
-
+         {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: [sub_item | _tail]}}} <-
+           Stripe.Subscription.update(sub_id, %{
+             cancel_at_period_end: false,
+             items: [%{id: item.id, plan: plan_id}]
+           }),
+         {:ok, %Payments.Subscription{} = updated_payments} <-
+           Payments.update_subscription(payments, %{
+             subscription_id: sub_id,
+             nickname: sub_item.plan.nickname |> String.downcase() |> convert_to_atom(),
+             plan_id: plan_id
+           }) do
+      conn
+      |> put_status(:ok)
+      |> put_view(AttoLinkWeb.SubscriptionsView)
+      |> render("show.json", subscriptions: updated_payments)
+    else
+      error ->
+        error
     end
   end
 
@@ -104,13 +101,12 @@ defmodule AttoLinkWeb.SubscriptionController do
     end
   end
 
-
   defp convert_to_atom(atom) do
     try do
       String.to_existing_atom(atom)
-     rescue
+    rescue
       ArgumentError ->
-          String.to_atom(atom)
+        String.to_atom(atom)
     end
   end
 end

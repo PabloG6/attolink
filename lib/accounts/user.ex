@@ -1,5 +1,3 @@
-
-
 defmodule AttoLink.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
@@ -15,6 +13,8 @@ defmodule AttoLink.Accounts.User do
     has_one :subscription, Payments.Subscription
     has_many :api_keys, Accounts.Api
     has_many :previews, AttoLink.Accounts.User
+    has_many :confirm_email, AttoLink.Comms.ConfirmEmail
+    has_many :password_reset, AttoLink.Auth.PasswordReset
     has_one :permissions, AttoLink.Security.Permissions
     timestamps()
   end
@@ -32,7 +32,17 @@ defmodule AttoLink.Accounts.User do
     user
     |> cast(attrs, [:email, :password, :customer_id])
     |> unique_constraint(:email)
+    |> put_password_hash
   end
+
+  def update_password_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:password])
+    |> put_password_hash()
+  end
+
+
+
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: nil}} = changeset) do
     changeset

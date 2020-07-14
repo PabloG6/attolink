@@ -43,12 +43,12 @@ defmodule AttoLinkWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
 
-  plug Corsica, origins: "*",
-                allow_headers: :all,
-                allow_credentials: true,
-                allow_methods: :all,
-                log: [rejected: :debug, accepted: :debug]
+  plug Corsica,
+    origins: "*",
+    allow_headers: :all,
+    allow_credentials: true,
+    allow_methods: :all,
+    log: [rejected: :debug, accepted: :debug]
+
   plug AttoLinkWeb.Router
-
-
 end

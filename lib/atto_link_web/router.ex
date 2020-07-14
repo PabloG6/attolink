@@ -25,6 +25,12 @@ defmodule AttoLinkWeb.Router do
     pipe_through [:api]
     post "/signup", UserController, :create
     post "/login", UserController, :login
+    post "/confirm_email", EmailController, :send_email
+    put "/confirm_email/:id", EmailController, :confirm_email_address
+    put "/confirm_email/update/:id", EmailController, :confirm_update_email
+
+    post "/auth/password/", PasswordController, :send_email
+    post "/auth/password/:id", PasswordController, :confirm_password_reset
   end
 
   scope "/", AttoLinkWeb do
@@ -40,18 +46,20 @@ defmodule AttoLinkWeb.Router do
     get "/permissions", PermissionsController, :show
     put "/permissions", PermissionsController, :update
     patch "/permissions", PermissionsController, :update
+    post "/confirm_email/update", EmailController, :send_update_email
+    put "/auth/password", PasswordController, :update
   end
+
+
+
 
   scope "/v1", AttoLinkWeb do
     pipe_through [:api]
     get "/plans", SubscriptionController, :index
-
   end
 
   scope "/v1", AttoLinkWeb do
     pipe_through [:api, :white_list, :api_auth]
     get "/preview", PreviewController, :create
   end
-
-
 end

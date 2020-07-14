@@ -100,7 +100,7 @@ defmodule AttoLink.Atto do
   end
 
   def check_html_throttle(%User{email: _email, id: id}) do
-    #TODO fix this to use payments.Subscription instead
+    # TODO fix this to use payments.Subscription instead
     # %AttoLink.Atto.Plan{storage_limit: storage_limit} = AttoLink.Atto.Plan.plan_type(plan)
     # get the size of each folder.
     query =
@@ -108,9 +108,7 @@ defmodule AttoLink.Atto do
         where: preview.user_id == ^id
 
     sum = AttoLink.Repo.aggregate(query, :sum, :byte_size) || 0
-
-
-   
+    {:ok, sum}
   end
 
   @spec save_html_page(String.t(), LinkPreview.Page.t()) :: {:ok, String.t(), non_neg_integer}
