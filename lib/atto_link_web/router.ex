@@ -23,6 +23,7 @@ defmodule AttoLinkWeb.Router do
 
   scope "/", AttoLinkWeb do
     pipe_through [:api]
+    get "/", HelloWorldController, :index
     post "/signup", UserController, :create
     post "/login", UserController, :login
     post "/confirm_email", EmailController, :send_email

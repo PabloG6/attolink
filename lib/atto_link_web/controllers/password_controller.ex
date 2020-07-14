@@ -10,7 +10,7 @@ defmodule AttoLinkWeb.PasswordController do
   def send_email(conn, %{"password" => %{"email" => email} = _password_params}) do
 
     with {:ok, %AttoLink.Accounts.User{} = user} <- AttoLink.Accounts.get_user_by(email: email),
-        {:ok, %PasswordReset{id: id} = password_reset} <- Auth.create_password_reset(%{user: user}),
+        {:ok, %PasswordReset{id: id} = _password_reset} <- Auth.create_password_reset(%{user: user}),
          :ok <- Auth.send_password_reset_email(email: email, id: id)
     do
 
@@ -33,7 +33,7 @@ defmodule AttoLinkWeb.PasswordController do
              }
            }))
 
-      err ->
+      _err ->
         conn
         |> send_resp(
           500,
