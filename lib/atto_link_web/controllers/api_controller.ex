@@ -15,6 +15,7 @@ defmodule AttoLinkWeb.ApiController do
   def create(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
 
+
     with {:ok, %Api{} = api} <- Accounts.create_api(%{user_id: user.id}) do
       conn
       |> put_status(:created)

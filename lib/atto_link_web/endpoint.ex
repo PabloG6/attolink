@@ -44,7 +44,7 @@ defmodule AttoLinkWeb.Endpoint do
   plug Plug.Session, @session_options
 
   plug Corsica,
-    origins: "*",
+    origins: [~r{^https?://(.*\.?)teenielink\.dev$}],
     allow_headers: :all,
     allow_credentials: true,
     allow_methods: :all,

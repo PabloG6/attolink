@@ -2,7 +2,6 @@ defmodule AttoLinkWeb.HelloWorldControllerTest do
   use AttoLinkWeb.ConnCase
 
   alias AttoLink.Greetings
-  alias AttoLink.Greetings.HelloWorld
 
 
 
