@@ -12,6 +12,13 @@ defmodule AttoLink.Cors do
     allow_methods: :all,
     allow_credentials: true
 
+  resource "/*",
+    origins: [~r{^https?://(.*\.?)teenielink\.dev$}],
+    allow_headers: :all,
+    allow_methods: :all,
+    allow_credentials: true
+
+
 
 
 end
