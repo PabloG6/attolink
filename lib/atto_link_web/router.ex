@@ -34,6 +34,8 @@ defmodule AttoLinkWeb.Router do
     post "/auth/password/:id", PasswordController, :confirm_password_reset
   end
 
+
+
   scope "/", AttoLinkWeb do
     pipe_through [:api, :auth]
     resources "/user", UserController, except: [:new, :edit, :create, :delete]

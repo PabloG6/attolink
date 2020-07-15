@@ -6,11 +6,18 @@ defmodule AttoLink.Cors do
     allow_methods: :all,
     max_age: 2000
 
-  resource "v1/*",
+  resource "v1/preview",
     origins: "*",
     allow_headers: :all,
     allow_methods: :all,
     allow_credentials: true
+
+  resource "/*",
+    origins: [~r{^https?://(.*\.?)teenielink\.dev$}],
+    allow_headers: :all,
+    allow_methods: :all,
+    allow_credentials: true
+
 
 
 
