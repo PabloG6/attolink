@@ -25,7 +25,7 @@ defmodule AttoLink.Atto.Plan do
 
   def plan_type(:basic) do
     %AttoLink.Atto.Plan{
-      preview_limit: 4000,
+      preview_limit: 1000,
       storage_limit: 1_073_741_824,
       request_limit: 4000,
       request_overage: 0.06,
@@ -41,11 +41,21 @@ defmodule AttoLink.Atto.Plan do
   """
   def plan_type(:premium) do
     %AttoLink.Atto.Plan{
-      preview_limit: 25000,
+      preview_limit: 3000,
       storage_limit: 16_106_127_360,
       request_limit: 20000,
       request_overage: 0.04,
       price: 25
+    }
+  end
+
+  def plan_type(:enterprise) do
+    %AttoLink.Atto.Plan{
+      preview_limit: 10000,
+      storage_limit: 16_601_127_360 * 2,
+      request_limit: 40000,
+      request_overage: 0.04,
+      price: 99
     }
   end
 end
