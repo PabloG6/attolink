@@ -11,8 +11,10 @@ use Mix.Config
 # before starting your production server.
 
 # Do not print debug messages in production
-config :logger, level: :info
+# config :logger, level: :info
 
+# Print debug messages in staging
+config :logger, :console, format: "[$level] $message\n", level: :debug
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
