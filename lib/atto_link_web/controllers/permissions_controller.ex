@@ -62,8 +62,10 @@ defmodule AttoLinkWeb.PermissionsController do
      render(conn, "show.json", permissions: permissions)
     end
       {:error, :no_permissions} ->
+
         {:ok, permissions} = Security.create_permissions(permissions_params |> Enum.into(%{"user_id" => id}))
         render(conn, "show.json", permissions: permissions)
+
     end
 
   end
