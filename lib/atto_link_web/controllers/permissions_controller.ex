@@ -52,15 +52,20 @@ defmodule AttoLinkWeb.PermissionsController do
 
   def update(conn, %{"permissions" => permissions_params}) do
     %AttoLink.Accounts.User{id: id} = AttoLink.Auth.Guardian.Plug.current_resource(conn)
-    {:ok, permissions} = Security.get_permissions_by!(user_id: id)
-
-    with {:ok, %Permissions{} = permissions} <-
-           Security.update_permissions(
-             permissions,
-             permissions_params |> Enum.into(%{"user_id" => id})
-           ) do
-      render(conn, "show.json", permissions: permissions)
+    case Security.get_permissions_by!(user_id: id) do
+      {:ok, permissions} ->
+        with {:ok, %Permissions{} = permissions} <-
+          Security.update_permissions(
+            permissions,
+            permissions_params |> Enum.into(%{"user_id" => id})
+          ) do
+     render(conn, "show.json", permissions: permissions)
     end
+      {:error, :no_permissions} ->
+        {:ok, permissions} = Security.create_permissions(permissions_params |> Enum.into(%{"user_id" => id}))
+        render(conn, "show.json", permissions: permissions)
+    end
+
   end
 
   def delete(conn, %{"id" => id}) do
