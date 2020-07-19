@@ -4,7 +4,7 @@ defmodule AttoLink.Repo.Migrations.CreateWhitelist do
   def change do
     create table(:whitelist) do
       add :ip_address, :string
-      add :user_id, references(:user, type: :uuid)
+      add :user_id, references(:user, type: :uuid, on_delete: :delete_all)
       timestamps()
     end
 
