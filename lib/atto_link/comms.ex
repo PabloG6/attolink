@@ -51,7 +51,8 @@ defmodule AttoLink.Comms do
     |> Email.put_from("support@teenielink.dev")
     |> Email.put_subject("Confirm your email address.")
     |> Email.put_text(
-      "Click the link below to confirm your email address. If you didn't sign up to teenielink with this email, feel free to ignore it.\n http://localhost:4200/confirm_email/#{
+      "Click the link below to confirm your email address. If you didn't sign up to teenielink with this email,
+       feel free to ignore it.\n #{Application.fetch_env!(:atto_link, :base_url)}/confirm_email/#{
         id
       }"
     )

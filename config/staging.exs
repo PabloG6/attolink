@@ -20,11 +20,16 @@ config :logger, :console, format: "[$level] $message\n", level: :debug
 # To get SSL working, you will need to add the `https` key
 # to the previous section and set your `:url` port to 443:
 #
+config :atto_link,
+  base_url: "https:/staging.teenielink.dev"
 config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "staging.teenielink.dev"],
   server: true,
   http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
   secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
+
+config :atto_link,
+  base_url: "http:/localhost:4000"
 
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.

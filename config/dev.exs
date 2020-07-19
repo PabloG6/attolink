@@ -22,6 +22,9 @@ config :atto_link, AttoLinkWeb.Endpoint,
   check_origin: false,
   watchers: []
 
+config :atto_link,
+  base_url: "http:/localhost:4000"
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
