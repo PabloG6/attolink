@@ -28,8 +28,6 @@ config :atto_link, AttoLinkWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: {:system, "STAGING_PORT"} || 6000],
   secret_key_base: System.get_env("STAGING_SECRET_KEY_BASE")
 
-config :atto_link,
-  base_url: "http:/localhost:4000"
 
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
