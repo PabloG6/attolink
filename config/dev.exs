@@ -23,7 +23,7 @@ config :atto_link, AttoLinkWeb.Endpoint,
   watchers: []
 
 config :atto_link,
-  base_url: "http:/localhost:4000"
+  base_url: "http:/localhost:4200"
 
 # ## SSL Support
 #

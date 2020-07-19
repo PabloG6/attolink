@@ -75,7 +75,7 @@ defmodule AttoLink.Auth do
     |> Email.put_from("support@teenielink.dev")
     |> Email.put_subject("Reset your password.")
     |> Email.put_text(
-      "Click the link below to reset your password. If you didn't ask for a link to reset your password, feel free to ignore it.\n http://localhost:4200/password_reset/#{
+      "Click the link below to reset your password. If you didn't ask for a link to reset your password, feel free to ignore it.\n #{Application.fetch_env!(:atto_link, :base_url)}/password_reset/#{
         id
       }"
     )
