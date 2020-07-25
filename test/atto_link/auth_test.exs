@@ -6,7 +6,7 @@ defmodule AttoLink.AuthTest do
   describe "password_reset" do
     alias AttoLink.Auth.PasswordReset
 
-    @user_attrs %{email: "email@email.com", password: "test_password"}
+    @user_attrs %{email: "email@email.com", password: "test_password", customer_id: "random_customer_id"}
 
     def password_fixture(%AttoLink.Accounts.User{} = user) do
       {:ok, password}

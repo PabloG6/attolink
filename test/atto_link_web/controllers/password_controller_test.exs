@@ -4,11 +4,12 @@ defmodule AttoLinkWeb.PasswordControllerTest do
 
   @create_attrs %{
     email: "testemail@website.com",
+
   }
 
 
   @invalid_attrs %{email: "noexists@email.com", password: "test_password"}
-  @user_attrs %{email: "testemail@website.com", password: "test_password"}
+  @user_attrs %{email: "testemail@website.com", password: "test_password", customer_id: "customer id"}
 
 
   def fixture(_user) do

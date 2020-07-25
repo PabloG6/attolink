@@ -4,7 +4,7 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
 
   defp fixture() do
     with {:ok, %Accounts.User{} = user} <-
-           Accounts.create_user(%{email: "some@email.com", password: "adfsfsakrjf"}),
+           Accounts.create_user(%{email: "some@email.com", password: "adfsfsakrjf", customer_id: "price_1H7wzpFiqLhwiC9fKHf53SoJ"}),
          {:ok, %Stripe.PaymentMethod{id: pm_id}} <-
            Stripe.PaymentMethod.create(%{
              type: "card",
@@ -13,6 +13,7 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       {:ok, payment_method_id: pm_id, user: user}
     end
   end
+
 
   setup %{conn: conn} do
     {:ok, payment_method_id: payment_method_id, user: user} = fixture()
@@ -31,13 +32,15 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       payment_method_id: payment_method_id,
       user: _user
     } do
-      {:ok, %Stripe.Plan{id: plan_id}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
+
+      {:ok, basic} = Application.fetch_env(:atto_link, :basic)
+      {:ok, %Stripe.Price{id: price_id}} = Stripe.Price.retrieve(basic)
 
       conn =
         post(
           conn,
           Routes.subscription_path(conn, :create,
-            subscriptions: %{payment_method_id: payment_method_id, plan_id: plan_id}
+            subscriptions: %{payment_method_id: payment_method_id, plan_id: price_id}
           )
         )
 
@@ -50,7 +53,8 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       conn: conn,
       payment_method_id: payment_method_id
     } do
-      {:ok, %Stripe.Plan{id: plan_id}} = _plan = Stripe.Plan.retrieve("plan_HGceCYomvatDSw")
+      {:ok, price} = Application.fetch_env(:atto_link, :basic)
+      {:ok, %Stripe.Price{id: plan_id}} = _plan = Stripe.Price.retrieve(price)
 
       conn =
         post(
@@ -61,8 +65,8 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
         )
 
       assert json_response(conn, 201)
-
-      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
+      {:ok, enterprise} = Application.fetch_env(:atto_link, :enterprise)
+      {:ok, %Stripe.Price{id: enterprise_id}} = Stripe.Price.retrieve(enterprise)
 
       conn =
         put(
@@ -77,8 +81,10 @@ defmodule AttoLinkWeb.SubscriptionControllerTest do
       conn: conn,
       payment_method_id: payment_method_id
     } do
-      {:ok, %Stripe.Plan{id: enterprise_id}} = Stripe.Plan.retrieve("plan_HGceCYomvatDSw")
-      {:ok, %Stripe.Plan{id: basic_plan}} = Stripe.Plan.retrieve("plan_HGceioHFJkqsNK")
+      {:ok, basic} = Application.fetch_env(:atto_link, :basic)
+      {:ok, enterprise} = Application.fetch_env(:atto_link, :enterprise)
+      {:ok, %Stripe.Price{id: enterprise_id}} = Stripe.Price.retrieve(enterprise)
+      {:ok, %Stripe.Price{id: basic_plan}} = Stripe.Price.retrieve(enterprise)
 
       conn =
         post(

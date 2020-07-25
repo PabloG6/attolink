@@ -7,6 +7,7 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   @create_attrs %{
     ip_address: "255.255.255.255"
   }
+ @user_attrs %{email: "user@gmail.com", password: "password", customer_id: "some customer id"}
   @update_attrs %{
     ip_address: "https://example.com",
     type: :url
@@ -21,7 +22,7 @@ defmodule AttoLinkWeb.WhiteListControllerTest do
   end
 
   setup %{conn: conn} do
-    {:ok, user} = Accounts.create_user(%{email: "user@gmail.com", password: "password"})
+    {:ok, user} = Accounts.create_user(@user_attrs)
     {:ok, token, _claims} = AttoLink.Auth.Guardian.encode_and_sign(user)
     conn = conn |> put_req_header("authorization", "bearer: " <> token)
     {:ok, conn: put_req_header(conn, "accept", "application/json"), user: user}

@@ -7,6 +7,7 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
   @create_attrs %{enable_whitelist: :all}
   @update_attrs %{enable_whitelist: :restricted}
   @invalid_attrs %{enable_whitelist: :disable_everything}
+  @user_attrs %{email: "some@email.com", password: "sfjaklf", customer_id: "customer id"}
 
   def fixture(user_id) do
     {:ok, permissions} =
@@ -104,7 +105,7 @@ defmodule AttoLinkWeb.PermissionsControllerTest do
   end
 
   defp create_user(_) do
-    {:ok, user} = AttoLink.Accounts.create_user(%{email: "some@email.com", password: "sfjaklf"})
+    {:ok, user} = AttoLink.Accounts.create_user(@user_attrs)
     {:ok, user: user}
   end
 

@@ -6,8 +6,8 @@ defmodule AttoLink.AccountsTest do
   describe "user" do
     alias AttoLink.Accounts.User
 
-    @valid_attrs %{email: "some email", password: "some password_hash"}
-    @update_attrs %{email: "some updated email", password: "some updated password_hash"}
+    @valid_attrs %{email: "some email", password: "some password_hash", customer_id: "customer id"}
+    @update_attrs %{email: "some updated email", password: "some updated password_hash", customer: "customer id"}
     @invalid_attrs %{email: nil, password: nil}
 
     def user_fixture(attrs \\ %{}) do
@@ -66,12 +66,14 @@ defmodule AttoLink.AccountsTest do
   describe "api_key" do
     alias AttoLink.Accounts.Api
 
-    @valid_attrs %{}
+    @valid_attrs %{email: "some email", password: "password", customer_id: "some random customer"}
     @update_attrs %{}
     @invalid_attrs %{}
 
+
+
     def api_fixture(attrs \\ %{}) do
-      {:ok, user} = Accounts.create_user(%{email: "some email", password: "password"})
+      user = user_fixture()
       api_attrs = %{user_id: user.id} |> Enum.into(@valid_attrs) |> Enum.into(attrs)
 
       {:ok, api} =
@@ -88,21 +90,23 @@ defmodule AttoLink.AccountsTest do
     end
 
     test "get_api!/1 returns the api with given id" do
+
       {_user, api} = api_fixture()
       assert Accounts.get_api!(api.id) == api
     end
 
     test "create_api/1 with valid data creates a api" do
-      {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+      user = user_fixture()
       assert {:ok, %Api{} = api} = Accounts.create_api(%{user_id: user.id})
     end
 
     test "create_api/1 with invalid data returns error changeset" do
-      {:ok, _user} = Accounts.create_user(%{email: "some email", password: "some password"})
+      user = user_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.create_api(%{})
     end
 
     test "delete_api/1 deletes the api" do
+
       {_user, api} = api_fixture()
       assert {:ok, %Api{}} = Accounts.delete_api(api)
       assert_raise Ecto.NoResultsError, fn -> Accounts.get_api!(api.id) end

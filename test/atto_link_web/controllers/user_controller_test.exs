@@ -6,16 +6,19 @@ defmodule AttoLinkWeb.UserControllerTest do
 
   @create_attrs %{
     email: "some@email.com",
-    password: "some password_hash"
+    password: "some password_hash",
+    customer_id: "some customer id"
   }
   @update_attrs %{
     email: "someupdated@email.com",
-    password: "some updated password_hash"
+    password: "some updated password_hash",
+    customer_id: "some customer id"
   }
   @invalid_attrs %{email: nil, password: nil}
 
   def fixture(:user) do
-    {:ok, user} = Accounts.create_user(@create_attrs)
+    {:ok, %Stripe.Customer{id: customer_id}} = Stripe.Customer.create(%{email: @create_attrs.email})
+    {:ok, user} = Accounts.create_user(%{customer_id: customer_id} |> Enum.into(@create_attrs))
     user
   end
 
@@ -36,7 +39,7 @@ defmodule AttoLinkWeb.UserControllerTest do
   describe "create user" do
     @tag user: true
     test "renders user when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs, payments: %{plan: "plan_free"})
+      conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs, payments: %{plan: Application.fetch_env!(:atto_link, :free)})
       assert %{"id" => id, "email" => email, "token" => token} = json_response(conn, 201)["data"]
       conn = build_conn() |> put_req_header("authorization", "bearer: " <> token)
       conn = get(conn, Routes.user_path(conn, :show, id))

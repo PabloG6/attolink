@@ -7,7 +7,7 @@ defmodule AttoLink.CommsTest do
     alias AttoLink.Comms.ConfirmEmail
 
 
-    @user_attrs %{email: "testemail@website.com", password: "test_password"}
+    @user_attrs %{email: "testemail@website.com", password: "test_password", customer_id: "random_customer_id"}
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
         attrs

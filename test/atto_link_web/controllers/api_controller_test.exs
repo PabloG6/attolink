@@ -58,7 +58,7 @@ defmodule AttoLinkWeb.ApiControllerTest do
   end
 
   defp create_user(_) do
-    {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+    {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password", customer_id: "customer id"})
     {:ok, user: user}
   end
 

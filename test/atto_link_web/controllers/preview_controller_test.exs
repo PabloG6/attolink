@@ -4,6 +4,7 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   alias AttoLink.Accounts
   alias AttoLink.Payments
   @valid_url "https://pusher.com/"
+  @user_attrs %{email: "someemail@email.com", password: "password", customer_id: "customer id"}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -76,11 +77,13 @@ defmodule AttoLinkWeb.PreviewControllerTest do
   end
 
   defp authenticate_user(%{conn: conn}) do
-    {:ok, user} = Accounts.create_user(%{email: "some email", password: "some password"})
+    {:ok, user} = Accounts.create_user(@user_attrs)
     {:ok, _plan} = Payments.create_subscription(%{
                         user_id: user.id,
                         nickname: :free,
-                        plan_id: "plan_free"
+                        plan_id: Application.fetch_env!(:atto_link, :free),
+                        subscription_id: "random"
+
                   })
     {:ok, token, _claims} = AttoLink.Auth.Guardian.encode_and_sign(user)
 

@@ -7,7 +7,7 @@ defmodule AttoLinkWeb.EmailControllerTest do
     email: "test@email.com",
   }
 
-  @user_attrs %{email: "test@email.com", password: "password"}
+  @user_attrs %{email: "test@email.com", password: "password", customer: "random customer id"}
 
 
   def fixture(:email) do
@@ -58,7 +58,7 @@ defmodule AttoLinkWeb.EmailControllerTest do
   end
 
   defp create_user(_) do
-    {:ok, user} = AttoLink.Accounts.create_user(%{email: "test@email.com", password: "some random password"})
+    {:ok, user} = AttoLink.Accounts.create_user(%{email: "test@email.com", password: "some random password", customer_id: "some random customer"})
     {:ok, user: user}
   end
 end

@@ -12,7 +12,7 @@ defmodule AttoLink.SecurityTest do
 
     def permissions_fixture(attrs \\ %{}) do
       {:ok, user} =
-        AttoLink.Accounts.create_user(%{email: "random@email.com", password: "radsfjal"})
+        AttoLink.Accounts.create_user(%{email: "random@email.com", password: "radsfjal", customer_id: "customer id"})
 
       {:ok, permissions} =
         attrs
@@ -37,7 +37,8 @@ defmodule AttoLink.SecurityTest do
       {:ok, user} =
         AttoLink.Accounts.create_user(%{
           email: "fsdaflk@email.com",
-          password: "salfjroiedfaslrkeicmgres"
+          password: "salfjroiedfaslrkeicmgres",
+          customer_id: "customer id"
         })
 
       assert {:ok, %Permissions{} = permissions} =
