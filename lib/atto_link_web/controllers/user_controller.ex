@@ -15,31 +15,25 @@ defmodule AttoLinkWeb.UserController do
   end
 
   def create(conn, %{
-        "user" => user_params,
-        "payment" => %{"payment_method_id" => pm_id, "plan" => plan_id}
+        "user" => %{"email" => email} = user_params,
+        "payment" => %{"payment_method_id" => pm_id, "plan" => price_id}
       }) do
-
-    with {:ok, %User{email: email, id: id} = user} <- Accounts.create_user(user_params),
-         {:ok, %Stripe.Customer{id: customer_id} = customer} <-
-           Stripe.Customer.create(%{email: email, payment_method: pm_id}),
+        IO.write "user param"
+    with {:ok, %Stripe.Customer{id: customer_id} = customer} <-
+      Stripe.Customer.create(%{email: email, payment_method: pm_id}),
+         {:ok, %User{id: id} = user} <-
+           Accounts.create_user(user_params |> Enum.into(%{"customer_id" => customer_id})),
          {:ok, %Stripe.Subscription{id: subscription_id}} <-
            Stripe.Subscription.create(%{
              customer: customer,
-             items: [%{plan: plan_id}],
+             items: [%{price: price_id}],
              default_payment_method: pm_id
-           }),
-         {:ok, %Stripe.Plan{nickname: nickname}} <- Stripe.Plan.retrieve(plan_id),
-         {:ok, %User{} = user} <-
-           Accounts.update_user(user, %{
-             customer_id: customer_id,
-             plan: String.downcase(nickname) |> convert_to_atom
            }),
          {:ok, %Payments.Subscription{}} <-
            Payments.create_subscription(%{
              subscription_id: subscription_id,
              customer_id: customer_id,
              user_id: id,
-             nickname: String.downcase(nickname) |> convert_to_atom
            }),
          {:ok, _permissions} <- AttoLink.Security.create_permissions(%{user_id: id}) do
 
@@ -47,7 +41,7 @@ defmodule AttoLinkWeb.UserController do
       |> put_status(:created)
       |> verify_user(user)
     else
-      {:error, %Stripe.Error{code: code, message: message}} ->
+      {:error, %Stripe.Error{code: code, message: message} = stripe_error} ->
         conn
         |> send_resp(500, Poison.encode!(%{code: code, message: message}))
 
@@ -56,16 +50,20 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  def create(conn, %{"user" => user_params, "payments" => %{"plan" => plan_id}} = _params) do
-
-    with {:ok, %User{id: id} = user} <- Accounts.create_user(user_params),
+  def create(conn, %{"user" => %{"email" => email} = user_params, "payments" => %{"plan" => price_id}} = _params) do
+    IO.puts "Price id #{price_id}"
+    with {:ok, %Stripe.Customer{id: customer_id}} <- Stripe.Customer.create(%{email: email}),
+        {:ok, %User{id: id} = user} <- Accounts.create_user(user_params |> Enum.into(%{"customer_id" => customer_id})),
+         {:ok, %Stripe.Subscription{id: subscription_id}} <- Stripe.Subscription.create(%{customer: customer_id, items: [%{price: price_id}]}),
          {:ok, %Payments.Subscription{}} <-
            Payments.create_subscription(%{
              user_id: id,
-             plan_id: plan_id,
+             plan_id: price_id,
+             subscription_id: subscription_id,
+             customer_id: customer_id,
              nickname: :free
            }),
-          :ok <- send_email(user)
+          {:ok, :sendgrid} <- send_email(user)
          do
 
 
@@ -74,8 +72,11 @@ defmodule AttoLinkWeb.UserController do
       |> verify_user(user)
 
          else
-          error
-            ->
+
+          {:error, :sendgrid, error}
+            -> error
+
+           error ->
                error
     end
   end
@@ -84,7 +85,7 @@ defmodule AttoLinkWeb.UserController do
     with {:ok, %AttoLink.Comms.ConfirmEmail{id: id}} <- AttoLink.Comms.create_email(%{user: user}),
          :ok <- AttoLink.Comms.send_confirm_email(email: email, id: id)
          do
-           :ok
+           {:ok, :sendgrid}
          else
           err ->
 
@@ -139,7 +140,7 @@ defmodule AttoLinkWeb.UserController do
         )
         |> send_resp()
         |> halt()
-      {:error, %Stripe.Error{}} ->
+      {:error, %Stripe.Error{} = stripe_error} ->
         conn
         |> resp(500, Poison.encode!(%{
             message: "An error occured when deleting your subscription, try again later",
@@ -197,11 +198,5 @@ defmodule AttoLinkWeb.UserController do
     end
   end
 
-  defp convert_to_atom(atom) do
-    try do
-      String.to_existing_atom(atom)
-    rescue
-      ArgumentError -> String.to_atom(atom)
-    end
-  end
+
 end

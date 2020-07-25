@@ -31,20 +31,19 @@ defmodule AttoLinkWeb.SubscriptionController do
              customer: customer,
              items: [%{plan: plan_id}]
            }),
-         {:ok, %Stripe.Plan{nickname: nickname, id: plan_id}} <- Stripe.Plan.retrieve(plan_id),
+           {:ok, %Payments.Subscription{nickname: nickname} = subscription} <-
+            Payments.create_subscription(%{
+              subscription_id: sub_id,
+              user_id: user.id,
+              plan_id: plan_id,
+              customer_id: cus_id
+            }),
+         {:ok, %Stripe.Price{id: plan_id}} <- Stripe.Price.retrieve(plan_id),
          {:ok, %Accounts.User{}} <-
            Accounts.update_user_plan(user, %{
              customer_id: cus_id,
-             plan: String.downcase(nickname) |> convert_to_atom()
-           }),
-         {:ok, %Payments.Subscription{} = subscription} <-
-           Payments.create_subscription(%{
-             subscription_id: sub_id,
-             user_id: user.id,
-             plan_id: plan_id,
-             nickname: nickname |> String.downcase |> convert_to_atom,
-             customer_id: cus_id
-           }) do
+             nickname: nickname,
+             }) do
       conn
       |> put_status(:created)
       |> put_view(AttoLinkWeb.SubscriptionsView)
@@ -64,18 +63,16 @@ defmodule AttoLinkWeb.SubscriptionController do
 
     with %Payments.Subscription{subscription_id: subscription_id} = payments <-
            Payments.get_subscriptions_by(user_id: user.id),
-         {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: items_list}}} <-
+         {:ok, %Stripe.Subscription{id: subscription_id, items: %Stripe.List{data: [sub_item | _]}}} <-
            Stripe.Subscription.retrieve(subscription_id),
-         item <- Enum.at(items_list, 0),
          {:ok, %Stripe.Subscription{id: sub_id, items: %Stripe.List{data: [sub_item | _tail]}}} <-
-           Stripe.Subscription.update(sub_id, %{
+           Stripe.Subscription.update(subscription_id, %{
              cancel_at_period_end: false,
-             items: [%{id: item.id, plan: plan_id}]
+             items: [%{id: sub_item.id, plan: plan_id}]
            }),
          {:ok, %Payments.Subscription{} = updated_payments} <-
            Payments.update_subscription(payments, %{
              subscription_id: sub_id,
-             nickname: sub_item.plan.nickname |> String.downcase() |> convert_to_atom(),
              plan_id: plan_id
            }) do
       conn
@@ -84,6 +81,7 @@ defmodule AttoLinkWeb.SubscriptionController do
       |> render("show.json", subscriptions: updated_payments)
     else
       error ->
+
         error
     end
   end
@@ -101,12 +99,6 @@ defmodule AttoLinkWeb.SubscriptionController do
     end
   end
 
-  defp convert_to_atom(atom) do
-    try do
-      String.to_existing_atom(atom)
-    rescue
-      ArgumentError ->
-        String.to_atom(atom)
-    end
-  end
+
+
 end
