@@ -21,7 +21,11 @@ config :logger, :console, format: "[$level] $message\n", level: :debug
 # to the previous section and set your `:url` port to 443:
 #
 config :atto_link,
-  base_url: "https://teenielink.dev"
+  base_url: "http://teenielink.dev",
+  free: "price_1H8H7KFiqLhwiC9fl9kxFrpW",
+  basic: "price_1H8H7KFiqLhwiC9fUtcdn0h4",
+  premium: "price_1H8H7KFiqLhwiC9fx4UiekeA",
+  enterprise: "price_1H8H7KFiqLhwiC9ffzPAIGcy"
 config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "staging.teenielink.dev"],
   server: true,

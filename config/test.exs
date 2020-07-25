@@ -25,3 +25,10 @@ config :hammer,
 config :sendgrid,
   api_key: "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",
   sandbox_enable: true
+
+config :atto_link,
+  base_url: "http:/localhost:4200",
+  free: "price_1H8H7KFiqLhwiC9fl9kxFrpW",
+  basic: "price_1H8H7KFiqLhwiC9fUtcdn0h4",
+  premium: "price_1H8H7KFiqLhwiC9fx4UiekeA",
+  enterprise: "price_1H8H7KFiqLhwiC9ffzPAIGcy"

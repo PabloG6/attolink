@@ -23,6 +23,9 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :logger, :console, format: "[$level] $message\n", level: :debug
+
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 config :tesla, adapter: Tesla.Adapter.Hackney
@@ -36,7 +39,7 @@ config :atto_link, AttoLink.Auth.Guardian,
   issuer: "atto_link",
   secret_key: "S3+n62kfi2VyUW5Ng0MDxfcmjPIgSkMhtCWVdYA4UTKnlBmbi3fUrBJP6t4vjGtD"
 
-config :stripity_stripe, api_key: "sk_test_VjpBvPBlY27yLOXU8r5lZEKi005iVURh37"
+config :stripity_stripe, api_key: "sk_test_LHoELJKl1rEHRmzHbuWFA3It00dpBynVoo"
 
 
 config :sendgrid,
