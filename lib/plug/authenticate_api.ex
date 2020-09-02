@@ -102,7 +102,7 @@ defmodule AttoLink.Auth.API do
     end
   end
 
-  defp
+
 
   @spec current_user(conn :: Plug.Conn.t()) :: {:error, :no_user} | {:ok, any} | {:error, :no_key}
   def current_user(%Plug.Conn{} = conn) do
