@@ -1,11 +1,12 @@
 defmodule AttoLinkWeb.UserController do
   use AttoLinkWeb, :controller
-
+  require Logger
   alias AttoLink.Accounts
   alias AttoLink.Accounts.User
   alias AttoLink.Payments
   alias AttoLink.Auth
   alias AttoLink.Repo
+  import Poison
   action_fallback AttoLinkWeb.FallbackController
 
   def index(conn, _params) do
@@ -18,7 +19,7 @@ defmodule AttoLinkWeb.UserController do
         "user" => %{"email" => email} = user_params,
         "payment" => %{"payment_method_id" => pm_id, "plan" => price_id}
       }) do
-        IO.write "user param"
+    Logger.info("signing up a new user");
     with {:ok, %Stripe.Customer{id: customer_id} = customer} <-
       Stripe.Customer.create(%{email: email, payment_method: pm_id}),
          {:ok, %User{id: id} = user} <-
@@ -46,12 +47,13 @@ defmodule AttoLinkWeb.UserController do
         |> send_resp(500, Poison.encode!(%{code: code, message: message}))
 
       err ->
+        Logger.info("an error occured when signing up a user #{inspect(err)}")
         err
     end
   end
 
   def create(conn, %{"user" => %{"email" => email} = user_params, "payments" => %{"plan" => price_id}} = _params) do
-    IO.puts "Price id #{price_id}"
+    Logger.info("creating a user without payment id")
     with {:ok, %Stripe.Customer{id: customer_id}} <- Stripe.Customer.create(%{email: email}),
         {:ok, %User{id: id} = user} <- Accounts.create_user(user_params |> Enum.into(%{"customer_id" => customer_id})),
          {:ok, %Stripe.Subscription{id: subscription_id}} <- Stripe.Subscription.create(%{customer: customer_id, items: [%{price: price_id}]}),
@@ -73,10 +75,21 @@ defmodule AttoLinkWeb.UserController do
 
          else
 
-          {:error, :sendgrid, error}
-            -> error
+          {:error, :sendgrid, error} ->
+               conn
+               |> send_resp(:internal_server_error, encode!(%{code: :sendgrid_error, message: "Something went wrong when sending your confirmation email.
+                You're account has been created but you'll have to login manually and request resending a confirmation email there."}))
 
+          {:error, %Stripe.Error{code: :network_error}} ->
+              conn
+              |> send_resp(:internal_server_error, encode!(%{code: :payment_error}, message: "The network seemed to be down when registering your plan with our plan provider. You're account is created but you'll need to log in manually."))
+          {:error, %Stripe.Error{}} = error ->
+              Logger.error("stripe error has occured inspect: #{inspect(error)}")
+              conn
+              |> send_resp(:internal_server_error, encode!(%{code: :payment_error, message: "Something went wrong when registering your plan. Your account has been created, but you'd have to log in manually and update your plan. "}
+              ))
            error ->
+               Logger.error("An error occured when signing up this user #{inspect(error)}")
                error
     end
   end
