@@ -22,10 +22,11 @@ config :logger, :console, format: "[$level] $message\n", level: :debug
 #
 config :atto_link,
   base_url: "http://teenielink.dev",
-  free: "price_1H8H7KFiqLhwiC9fl9kxFrpW",
-  basic: "price_1H8H7KFiqLhwiC9fUtcdn0h4",
-  premium: "price_1H8H7KFiqLhwiC9fx4UiekeA",
-  enterprise: "price_1H8H7KFiqLhwiC9ffzPAIGcy"
+  free: "price_1H7wzpFiqLhwiC9fRNp7HFeB",
+  basic: "price_1H7wzpFiqLhwiC9fKHf53SoJ",
+  premium: "price_1H7wzqFiqLhwiC9f2S4jJS2b",
+  enterprise: "price_1H7wzqFiqLhwiC9fbBAyCuVB"
+  origins: [~r{^https?://(.*\.?)teenielink\.dev}]
 config :atto_link, AttoLinkWeb.Endpoint,
   url: [host: "staging.teenielink.dev"],
   server: true,

@@ -41,6 +41,13 @@ config :atto_link, AttoLink.Auth.Guardian,
 
 config :stripity_stripe, api_key: "sk_test_LHoELJKl1rEHRmzHbuWFA3It00dpBynVoo"
 
+config :atto_link,
+  origins: [~r{^https?://(.*\.?)teenielink\.dev}, "http://localhost:4200"],
+  free: "price_1H8H7KFiqLhwiC9fl9kxFrpW",
+  basic: "price_1H8H7KFiqLhwiC9fUtcdn0h4",
+  premium: "price_1H8H7KFiqLhwiC9fx4UiekeA",
+  enterprise: "price_1H8H7KFiqLhwiC9ffzPAIGcy"
+
 
 config :sendgrid,
   api_key: "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"

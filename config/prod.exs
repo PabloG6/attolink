@@ -13,7 +13,12 @@ use Mix.Config
 # Do not print debug messages in production
 config :logger, level: :info
 config :atto_link,
-  base_url: "https://teenielink.dev"
+  base_url: "https://teenielink.dev",
+  origins: [~r{^https?://(.*\.?)teenielink\.dev}],
+  free: "price_1H7wzpFiqLhwiC9fRNp7HFeB",
+  basic: "price_1H7wzpFiqLhwiC9fKHf53SoJ",
+  premium: "price_1H7wzqFiqLhwiC9f2S4jJS2b",
+  enterprise: "price_1H7wzqFiqLhwiC9fbBAyCuVB"
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

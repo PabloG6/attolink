@@ -66,3 +66,11 @@ config :todo, print: :all, persist: false
 
 config :hammer,
   backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60, cleanup_interval_ms: 60_000 * 10]}
+
+config :atto_link,
+  free: "price_1H8H7KFiqLhwiC9fl9kxFrpW",
+  basic: "price_1H8H7KFiqLhwiC9fUtcdn0h4",
+  premium: "price_1H8H7KFiqLhwiC9fx4UiekeA",
+  enterprise: "price_1H8H7KFiqLhwiC9ffzPAIGcy",
+
+  origins: [~r{^https?://(.*\.?)teenielink\.dev}, "http://localhost:4200"]
