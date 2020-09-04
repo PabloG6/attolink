@@ -2,7 +2,7 @@ defmodule AttoLink.Auth.API do
   import Plug.Conn
   alias AttoLink.Accounts
   @admin_secret "ubPAbYOr2rNWgRDHLaac4aad+M5boGdMAcky5x3kEWA6lmsRNhBKSwmP+UKHHIps"
-  @admin_api_key  "attolink-api-key"
+  @api_header_key  "teenie-api-key"
   @spec init(Keyword.t()) :: Keyword.t()
   def init(options), do: options
 
@@ -14,7 +14,7 @@ defmodule AttoLink.Auth.API do
   end
 
   defp verify_admin(%Plug.Conn{} = conn) do
-    with [key | _] <- get_req_header(conn, @admin_api_key),
+    with [key | _] <- get_req_header(conn, @api_header_key),
          true <- key == @admin_secret do
 
       {:ok, :admin}
@@ -93,7 +93,7 @@ defmodule AttoLink.Auth.API do
   end
 
   defp fetch_key(%Plug.Conn{} = conn) do
-    case get_req_header(conn, "attolink-api-key") do
+    case get_req_header(conn, @api_header_key) do
       [key | _tail] ->
         key
 
