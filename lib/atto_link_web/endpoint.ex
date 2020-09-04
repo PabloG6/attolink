@@ -42,7 +42,7 @@ defmodule AttoLinkWeb.Endpoint do
 
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug Attolink.Cors
+  plug AttoLink.Cors
 
 
   plug AttoLinkWeb.Router

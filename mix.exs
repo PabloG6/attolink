@@ -55,7 +55,7 @@ defmodule AttoLink.MixProject do
       {:jason, "~> 1.0"},
       {:hammer, "~> 6.0"},
       {:mogrify, "~> 0.7.3"},
-      {:link_preview, git: "https://github.com/PabloG6/link_preview.git"},
+      {:link_preview, git: "https://github.com/PabloG6/link_preview.git", branch: "fast_html"},
       {:plug_cowboy, "~> 2.0"},
       {:guardian, "~> 2.0"},
       {:poison, "~> 4.0"},
