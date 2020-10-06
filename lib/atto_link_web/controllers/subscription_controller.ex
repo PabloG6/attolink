@@ -1,6 +1,6 @@
 defmodule AttoLinkWeb.SubscriptionController do
   use AttoLinkWeb, :controller
-
+  require Logger
   action_fallback AttoLinkWeb.FallbackController
   alias AttoLink.Accounts
   alias AttoLink.Payments
@@ -81,7 +81,7 @@ defmodule AttoLinkWeb.SubscriptionController do
       |> render("show.json", subscriptions: updated_payments)
     else
       error ->
-
+        Logger.error("Unknown error has occured inspecting: #{inspect(error)}")
         error
     end
   end
